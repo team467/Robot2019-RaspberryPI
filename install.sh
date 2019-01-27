@@ -7,3 +7,4 @@ sudo chmod +x *
 ./pynetworktables.sh
 ./pixycam.sh
 cd ~/
+sudo rm -r Robot2019-RaspberryPI
