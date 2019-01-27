@@ -1,4 +1,6 @@
 #!/bin/bash
+sudo su pi
+sudo apt-get install git -y
 sudo mv * ../
 cd ../
 cd scripts
