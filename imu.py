@@ -4,7 +4,7 @@
 #import ctypes
 from ctypes import *
 
-path = "/home/pi/lib/liblsm9ds1cwrapper.so"
+path = "/home/pi/libs/LSM9DS1_RaspberryPi_Library/lib/liblsm9ds1cwrapper.so"
 lib = cdll.LoadLibrary(path)
 
 lib.lsm9ds1_create.argtypes = []
