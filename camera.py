@@ -25,13 +25,20 @@ with cond:
 # Insert your processing code here
 table = NetworkTables.getTable('camera')
 
-var prev = 0
+def camera_switcher(cameraNum): 
+    switcher = { 
+        0: ["ln", "-sfn", "/dev/video0", "/home/vid"], 
+        1: ["ln", "-sfn", "/dev/video1", "/home/vid"], 
+        2: ["ln", "-sfn", "/dev/video2", "/home/vid"], 
+		3: ["ln", "-sfn", "/dev/video3", "/home/vid"]
+    }
+    return switcher.get(cameraNum, 0) 
+  
+
+prev = 0
+subprocess.call(["ln", "-sfn", "/dev/video0", "/home/vid"])
 
 while True:
-    if table.getNumber('camera', 0) == 1:
-	    if prev != table.getNumber('camera', 0):
-		    subprocess.run(["ln", "-sfn", "/dev/video1", "/home/vid"])
-			prev = 1
-		else: 
-		    subprocess.run(["ln", "-sfn", "/dev/video0", "/home/vid"])
-			prev = 0
+    if table.getNumber('camera', 0) != prev and 0 <= table.getNumber('camera', 0) <= 3:
+        subprocess.call(camera_switcher(table.getNumber('camera', 0)))
+        prev = table.getNumber('camera', 0)
