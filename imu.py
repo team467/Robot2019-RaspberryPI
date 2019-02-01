@@ -4,7 +4,7 @@
 #import ctypes
 from ctypes import *
 
-path = "/home/pi/libs/LSM9DS1_RaspberryPi_Library/lib/liblsm9ds1cwrapper.so"
+path = "libs/LSM9DS1_RaspberryPi_Library/lib/liblsm9ds1cwrapper.so"
 lib = cdll.LoadLibrary(path)
 
 lib.lsm9ds1_create.argtypes = []
@@ -90,10 +90,6 @@ if __name__ == "__main__":
     lib.lsm9ds1_calibrate(imu)
 
     while True:
-	if table.getNumber("recal", 0) == 1:
-            lib.lsm9ds1_calibrate(imu)
-            table.putNumber("recal", 0)
-
         while lib.lsm9ds1_gyroAvailable(imu) == 0:
             pass
         lib.lsm9ds1_readGyro(imu)
