@@ -44,11 +44,18 @@ def extra_processing(pipeline):
         print ('Box 1 width: ' + str(widths[0]), 'Box 2 width: ' + str(widths[1]))
         print ('Box 1 height: ' + str(heights[0]), 'Box 2 height: ' + str(heights[1]))
         
-        midpoint = abs(((center_x_positions[0] + center_x_positions[1])/2) - 350)
-        print ('distance', midpoint)
+        midpoint = ((center_x_positions[0] + center_x_positions[1])/2)
+        distance = abs(midpoint - 350)
+        print ('distance', distance)
 
-        angle = 35 * midpoint / 350
-        print ('Angle = ' + str(angle))
+        angle = 35 * distance / 350
+
+        if midpoint > 350:
+            print ('Angle = ' + str(angle))
+        else:
+            angle = angle * -1
+            print ('Angle = ' + str(angle))
+
         table.putNumber('angle', angle)
 
     
