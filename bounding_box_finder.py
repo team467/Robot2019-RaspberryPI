@@ -12,7 +12,7 @@ def extra_processing(pipeline):
     center_y_positions = []
     widths = []
     heights = []
-
+ 
     # Find the bounding boxes of the contours to get x, y, width, and height
     for contour in pipeline.filter_contours_output:
         x, y, w, h = cv2.boundingRect(contour)
@@ -64,12 +64,12 @@ def main():
 
     frame_print = input ("How many frames do you want? ")
 
-    '''
+    
     print('Initializing NetworkTables')
     NetworkTables.setClientMode()
     NetworkTables.setIPAddress('localhost')
     NetworkTables.initialize()
-    '''
+    
 
     print('Creating video capture')
     cap = cv2.VideoCapture(1)
