@@ -1,5 +1,5 @@
 import cv2
-from networktables import NetworkTables
+#from networktables import NetworkTables
 from grip import TapeRecognitionCode
 
 def extra_processing(pipeline):
@@ -56,19 +56,21 @@ def extra_processing(pipeline):
             angle = angle * -1
             print ('Angle = ' + str(angle))
 
-        table.putNumber('angle', angle)
-
+        
+        #table.putNumber('angle', angle)
     
+    return center_x_positions[0], center_y_positions[0], center_x_positions[1], center_y_positions[1]
 
 def main():
 
     frame_print = input ("How many frames do you want? ")
 
-    
+    '''
     print('Initializing NetworkTables')
     NetworkTables.setClientMode()
     NetworkTables.setIPAddress('localhost')
     NetworkTables.initialize()
+    '''
     
 
     print('Creating video capture')
@@ -79,20 +81,38 @@ def main():
 
     frame_number = 0
 
+    x1_center = 0
+    x2_center = 0
+    y1_center = 0
+    y2_center = 0
+
     print('Running pipeline')
     while cap.isOpened():
+
         frame_number = frame_number + 1
         #print ("in while loop")
         have_frame, frame = cap.read()
 
         if have_frame:
+
             #print ("in if")
             pipeline.process(frame)
             if frame_number%int(frame_print) == 0:
                 print (frame_number/20)
-                extra_processing(pipeline)
+                #extra_processing(pipeline)
+
+                x1_center, y1_center, x2_center, y2_center = extra_processing(pipeline)
+                
             #img = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+
+            cv2.line(frame, (int(x1_center + 20), int(y1_center)), (int(x1_center - 20), int(y1_center)),(0,255,0), 3)
+            cv2.line(frame, (int(x2_center + 20), int(y2_center)), (int(x2_center - 20), int(y2_center)),(0,255,0), 3)
+
+            cv2.line(frame, (int(x1_center), int(y1_center + 20)), (int(x1_center), int(y1_center - 20)),(0,255,0), 3)
+            cv2.line(frame, (int(x2_center), int(y2_center + 20)), (int(x2_center), int(y2_center - 20)),(0,255,0), 3)
+
             cv2.imshow('video', cv2.resize(frame, (800, 600)))
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     
@@ -101,7 +121,6 @@ def main():
     cv2.destroyAllWindows()
 
     print('Capture closed')
-
 
 if __name__ == '__main__':
     main()
