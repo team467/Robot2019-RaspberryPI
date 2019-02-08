@@ -64,6 +64,7 @@ def extra_processing(pipeline):
 def main():
 
     frame_print = input ("How many frames do you want? ")
+    camera_used = input ("Which camera do you want to use? (0, 1, 2, or 3)")
 
     '''
     print('Initializing NetworkTables')
@@ -74,7 +75,7 @@ def main():
     
 
     print('Creating video capture')
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(int(camera_used))
 
     print('Creating pipeline')
     pipeline = TapeRecognitionCode()
