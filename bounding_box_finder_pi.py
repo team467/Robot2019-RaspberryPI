@@ -22,20 +22,7 @@ def extra_processing(pipeline):
         heights.append(h)
 
     # Publish to the '/vision/red_areas' network table
-    '''
-    table = NetworkTables.getTable('/vision/red_areas')
-    table.putNumberArray('x', center_x_positions)
-    table.putNumberArray('y', center_y_positions)
-    table.putNumberArray('width', widths)
-    table.putNumberArray('height', heights)
-    '''
 
-    '''
-    print ('Box 1 center point', 'x: ' + str(center_x_positions[0]), 'y: ' + str(center_y_positions[0]))
-    print ('y', center_y_positions)
-    print ('width', widths)
-    print ('height', heights)
-    '''
 
     if len(heights) == 2:
 
@@ -57,7 +44,7 @@ def extra_processing(pipeline):
             print ('Angle = ' + str(angle))
 
         
-        #table.putNumber('angle', angle)
+        table.putNumber('angle', angle)
     
     return center_x_positions[0], center_y_positions[0], center_x_positions[1], center_y_positions[1]
 
@@ -73,21 +60,19 @@ def main():
     NetworkTables.initialize()
     '''
     
-    cap = cv2.VideoCapture(int(camera_used))
 
-    '''
     print('Creating video capture')
+    cap = cv2.VideoCapture(int(camera_used))
 
     print('Creating pipeline')
     pipeline = TapeRecognitionCode()
+
+    frame_number = 0
 
     x1_center = 0
     x2_center = 0
     y1_center = 0
     y2_center = 0
-    '''
-
-    frame_number = 0
 
     print('Running pipeline')
     while cap.isOpened():
@@ -102,29 +87,7 @@ def main():
             pipeline.process(frame)
             if frame_number%int(frame_print) == 0:
                 print (frame_number/20)
-                #extra_processing(pipeline)
-
-                x1_center, y1_center, x2_center, y2_center = extra_processing(pipeline)
-                
-            #img = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-
-            '''
-            cv2.line(frame, (int(x1_center + 20), int(y1_center)), (int(x1_center - 20), int(y1_center)),(0,255,0), 3)
-            cv2.line(frame, (int(x2_center + 20), int(y2_center)), (int(x2_center - 20), int(y2_center)),(0,255,0), 3)
-
-            cv2.line(frame, (int(x1_center), int(y1_center + 20)), (int(x1_center), int(y1_center - 20)),(0,255,0), 3)
-            cv2.line(frame, (int(x2_center), int(y2_center + 20)), (int(x2_center), int(y2_center - 20)),(0,255,0), 3)
-
-            cv2.imshow('video', cv2.resize(frame, (800, 600)))
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            '''
-    '''
-    cap.release()
-
-    cv2.destroyAllWindows()
-    '''
+                extra_processing(pipeline)
 
     print('Capture closed')
 
