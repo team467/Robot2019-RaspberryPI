@@ -53,7 +53,7 @@ def main():
     turning_angle = 0 
 
     frame_print = input ("How many frames do you want? ")
-    camera_used = input ("Which camera do you want to use? (0, 1, 2, or 3)")
+    camera_used = input ("Which camera do you want to use? ")
 
     print('Initializing NetworkTables')
     cond = threading.Condition()
