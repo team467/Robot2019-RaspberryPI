@@ -99,7 +99,7 @@ def main():
             #print ("in if")
             pipeline.process(frame)
             if frame_number%int(frame_print) == 0:
-                print (frame_number/20)
+                print (frame_number/int(frame_print))
                 #extra_processing(pipeline)
 
                 x1_center, y1_center, x2_center, y2_center = extra_processing(pipeline)
