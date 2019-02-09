@@ -4,6 +4,7 @@
 import threading
 from networktables import NetworkTables
 import subprocess
+import sys
 
 cond = threading.Condition()
 notified = [False]
@@ -27,10 +28,10 @@ table = NetworkTables.getTable('camera')
 
 def camera_switcher(cameraNum): 
     switcher = { 
-        0: ["ln", "-sfn", "/dev/video0", "/home/vid"], 
-        1: ["ln", "-sfn", "/dev/video1", "/home/vid"], 
-        2: ["ln", "-sfn", "/dev/video2", "/home/vid"], 
-		3: ["ln", "-sfn", "/dev/video3", "/home/vid"]
+        0: ["ln", "-sfn", "/dev/video" + sys.argv[1], "/home/vid"], 
+        1: ["ln", "-sfn", "/dev/video" + sys.argv[2], "/home/vid"], 
+        2: ["ln", "-sfn", "/dev/video" + sys.argv[3], "/home/vid"], 
+		3: ["ln", "-sfn", "/dev/video" + sys.argv[4], "/home/vid"]
     }
     return switcher.get(cameraNum, 0) 
   
