@@ -13,8 +13,8 @@ class TapeRecognitionCode:
         """
 
         self.__cv_resize_dsize = (0, 0)
-        self.__cv_resize_fx = 0.1
-        self.__cv_resize_fy = 0.1
+        self.__cv_resize_fx = 0.2
+        self.__cv_resize_fy = 0.2
         self.__cv_resize_interpolation = cv2.INTER_LINEAR
 
         self.cv_resize_output = None
@@ -44,7 +44,7 @@ class TapeRecognitionCode:
         self.find_contours_output = None
 
         self.__filter_contours_contours = self.find_contours_output
-        self.__filter_contours_min_area = 200.0
+        self.__filter_contours_min_area = 5.0
         self.__filter_contours_min_perimeter = 1.0
         self.__filter_contours_min_width = 1.0
         self.__filter_contours_max_width = 1000.0
