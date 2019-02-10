@@ -53,7 +53,7 @@ def main():
     turning_angle = 0 
 
     frame_print = input ("How many frames do you want? ")
-    camera_used = input ("Which camera do you want to use? ")
+    #camera_used = input ("Which camera do you want to use? ")
 
     print('Initializing NetworkTables')
     cond = threading.Condition()
@@ -80,7 +80,10 @@ def main():
     
 
     print('Creating video capture')
-    cap = cv2.VideoCapture(int(camera_used))
+    cap = cv2.VideoCapture("/home/vid1")
+
+    if not cap.isOpened():
+        cap.open("/home/vid1")
 
     frame_number = 0
 
@@ -114,7 +117,7 @@ def main():
                     print ('Box 1 height: ' + str(height1), 'Box 2 height: ' + str(height2))
                     '''
                     
-                    print ('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxAngle = ' + str(turning_angle))
+                    print ('Angle = ' + str(turning_angle))
 
             #time2 = time.clock() * 1000
 
