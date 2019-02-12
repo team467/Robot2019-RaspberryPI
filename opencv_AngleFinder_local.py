@@ -1,3 +1,4 @@
+import keyboard
 import cv2
 #from networktables import NetworkTables
 from grip import TapeRecognitionCode
@@ -107,19 +108,30 @@ def main():
                 #print (pipeline.cv_resize_output)
 
             #img = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-            '''
+            
             cv2.line(frame, (int(x1_center + 20), int(y1_center)), (int(x1_center - 20), int(y1_center)),(0,255,0), 3)
             cv2.line(frame, (int(x2_center + 20), int(y2_center)), (int(x2_center - 20), int(y2_center)),(0,255,0), 3)
 
             cv2.line(frame, (int(x1_center), int(y1_center + 20)), (int(x1_center), int(y1_center - 20)),(0,255,0), 3)
             cv2.line(frame, (int(x2_center), int(y2_center + 20)), (int(x2_center), int(y2_center - 20)),(0,255,0), 3)
+            
+            #cv2.imshow('video', frame)
+
             '''
-            cv2.imshow('video', frame)
-
-
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            '''
     
+        try:
+            if keyboard.is_pressed('s'):
+                cap.release()
+                camera_switch = input ('Which camera do you want to switch to? ')
+                cap = cv2.VideoCapture(int(camera_switch))
+            elif keyboard.is_pressed('q'):
+                break
+        except:
+            cap = cv2.VideoCapture(int(camera_used))
+
     cap.release()
 
     cv2.destroyAllWindows()
