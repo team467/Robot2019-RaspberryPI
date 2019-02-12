@@ -1,3 +1,4 @@
+import keyboard
 import time
 import cv2
 from networktables import *
@@ -53,7 +54,7 @@ def main():
     turning_angle = 0 
 
     frame_print = input ("How many frames do you want? ")
-    #camera_used = input ("Which camera do you want to use? ")
+    camera_used = input ("Which camera do you want to use? ")
 
     print('Initializing NetworkTables')
     cond = threading.Condition()
@@ -80,11 +81,8 @@ def main():
     
 
     print('Creating video capture')
-    cap = cv2.VideoCapture("/home/vid1")
-
-    if not cap.isOpened():
-        cap.open("/home/vid1")
-
+    cap = cv2.VideoCapture(int(camera_used))
+    #cap = cv2.VideoCapture('/dev/video0')
     frame_number = 0
 
     print('Creating pipeline')
@@ -122,7 +120,8 @@ def main():
             #time2 = time.clock() * 1000
 
             #print (time2 - time1)
-                    
+    
+    cap.release()
 
     print('Capture closed')
 
