@@ -31,7 +31,7 @@ def camera_switcher(cameraNum):
         0: ["ln", "-sfn", "/dev/video" + sys.argv[1], "/home/vid"], 
         1: ["ln", "-sfn", "/dev/video" + sys.argv[2], "/home/vid"], 
         2: ["ln", "-sfn", "/dev/video" + sys.argv[3], "/home/vid"], 
-		3: ["ln", "-sfn", "/dev/video" + sys.argv[4], "/home/vid"]
+	3: ["ln", "-sfn", "/dev/video" + sys.argv[4], "/home/vid"]
     }
     return switcher.get(cameraNum, 0) 
   
@@ -40,6 +40,6 @@ prev = 0
 subprocess.call(["ln", "-sfn", "/dev/video0", "/home/vid"])
 
 while True:
-    if table.getNumber('camera', 0) != prev and 0 <= table.getNumber('camera', 0) <= 3:
-        subprocess.call(camera_switcher(table.getNumber('camera', 0)))
-        prev = table.getNumber('camera', 0)
+    if int(table.getNumber('camera', 0)) != prev and 0 <= int(table.getNumber('camera', 0)) <= 3:
+        subprocess.call(camera_switcher(int(table.getNumber('camera', 0))))
+        prev = int(table.getNumber('camera', 0))
