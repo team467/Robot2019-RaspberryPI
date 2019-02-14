@@ -5,6 +5,7 @@ from networktables import *
 from grip import TapeRecognitionCode
 import threading
 from ctypes import *
+import sys
 
 def extra_processing(pipeline):
     """
@@ -54,7 +55,7 @@ def main():
     turning_angle = 0 
 
     frame_print = input ("How many frames do you want? ")
-    camera_used = input ("Which camera do you want to use? ")
+    #camera_used = input ("Which camera do you want to use? ")
 
     print('Initializing NetworkTables')
     cond = threading.Condition()
@@ -81,9 +82,17 @@ def main():
     
 
     print('Creating video capture')
-    cap = cv2.VideoCapture(int(camera_used))
-    #cap = cv2.VideoCapture('/dev/video0')
+    #cap = cv2.VideoCapture(int(camera_used))
+    cap = cv2.VideoCapture('http://localhost:1181/stream.mjpg')
+    print ('camera found')
+
     frame_number = 0
+
+    if not cap.isOpened():
+        try:
+            cap.open('http://localhost:1181/stream.mjpg')
+        except:
+            sys.exc_info()[0]
 
     print('Creating pipeline')
     pipeline = TapeRecognitionCode()
