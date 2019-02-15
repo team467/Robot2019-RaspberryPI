@@ -13,8 +13,8 @@ class TapeRecognitionCode:
         """
 
         self.__cv_resize_dsize = (0, 0)
-        self.__cv_resize_fx = 0.2
-        self.__cv_resize_fy = 0.2
+        self.__cv_resize_fx = 0.875
+        self.__cv_resize_fy = 0.875
         self.__cv_resize_interpolation = cv2.INTER_LINEAR
 
         self.cv_resize_output = None
