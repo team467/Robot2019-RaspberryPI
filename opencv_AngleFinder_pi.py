@@ -1,4 +1,3 @@
-import keyboard
 import time
 import cv2
 from networktables import *
@@ -48,22 +47,27 @@ def extra_processing(pipeline):
 
         if midpoint < (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx):
             angle = angle * -1
+        have_angle = True
+    else:
+        angle = sys.maxint
+        have_angle = False
     
-    return angle
+    return angle, have_angle
 
 def main():
 
     turning_angle = 0 
+    haveAngle = True
 
-    frame_print = input ("How many frames do you want? ")
+    frame_print = 1
     #camera_used = input ("Which camera do you want to use? ")
 
-    print('Initializing NetworkTables')
+    #print('Initializing NetworkTables')
     cond = threading.Condition()
     notified = [False]
 
     def connectionListener(connected, info):
-        print(info, '; Connected=%s' % connected)
+        #print(info, '; Connected=%s' % connected)
         with cond:
             notified[0] = True
             cond.notify()
@@ -72,20 +76,20 @@ def main():
     NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
     with cond:
-        print("Waiting")
+        #print("Waiting")
         if not notified[0]:
             cond.wait()
 
     # Insert your processing code here
-    print("Connected!")
+    #print("Connected!")
 
     table = NetworkTables.getTable('vision')
     
 
-    print('Creating video capture')
+    #print('Creating video capture')
     #cap = cv2.VideoCapture(int(camera_used))
     cap = cv2.VideoCapture('http://localhost:1181/stream.mjpg')
-    print ('camera found')
+    #print ('camera found')
 
     frame_number = 0
 
@@ -95,10 +99,10 @@ def main():
         except:
             sys.exc_info()[0]
 
-    print('Creating pipeline')
+    #print('Creating pipeline')
     pipeline = TapeRecognitionCode()
 
-    print('Running pipeline')
+    #print('Running pipeline')
     while cap.isOpened():
 
         frame_number = frame_number + 1
@@ -111,8 +115,9 @@ def main():
             #print ("in if")
             pipeline.process(frame)
             if pipeline is not None:
-                turning_angle = extra_processing(pipeline)
+                turning_angle, haveAngle = extra_processing(pipeline)
 
+                table.putBoolean('have angle', haveAngle)
                 table.putNumber('angle', turning_angle)
 
                 if frame_number%int(frame_print) == 0:
@@ -138,7 +143,11 @@ def main():
                     print ('Box 1 height: ' + str(height1), 'Box 2 height: ' + str(height2))
                     '''
                     
-                    print ('Angle = ' + str(turning_angle))
+                    #print ('Angle = ' + str(turning_angle))
+                else:
+                    haveAngle = False
+                    table.putBoolean('have angle', haveAngle)
+
 
             #time2 = time.clock() * 1000
 
