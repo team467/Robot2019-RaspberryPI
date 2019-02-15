@@ -18,6 +18,7 @@ def extra_processing(pipeline):
     widths = []
     heights = []
     angle = 0
+    frame_width_midpt = 80
     # Find the bounding boxes of the contours to get x, y, width, and height
     for contour in pipeline.filter_contours_output:
         x, y, w, h = cv2.boundingRect(contour)
@@ -39,13 +40,13 @@ def extra_processing(pipeline):
         '''
 
         midpoint = ((center_x_positions[0] + center_x_positions[1])/2)
-        distance = abs(midpoint - (350* pipeline._TapeRecognitionCode__cv_resize_fx))
+        distance = abs(midpoint - (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx))
 
         #print ('distance', distance)
 
-        angle = 35 * distance / (350* pipeline._TapeRecognitionCode__cv_resize_fx)
+        angle = 35 * distance / (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx)
 
-        if midpoint < (350* pipeline._TapeRecognitionCode__cv_resize_fx):
+        if midpoint < (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx):
             angle = angle * -1
     
     return angle
@@ -116,7 +117,20 @@ def main():
 
                 if frame_number%int(frame_print) == 0:
 
+                    #height, width, channels = cv2.imread(frame).shape
+                    #print('frame width = ' + cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                    #print("frame width : %d" % cap.get(cv2.CV_CAP_PROP_FRAME_WIDTH))
                     '''
+                    print('__cv_resize_dsize')
+                    print(pipeline.__cv_resize_dsize)
+                    print('__cv_resize_src')
+                    print(pipeline.__cv_resize_src)
+                    print ('resize_output')
+                    
+                    print('frame width = ' + str(frame))
+                    print (pipeline._TapeRecognitionCode__cv_resize_src)
+                    
+                    
                     print (frame_number/int(frame_print))
                     print ('Box 1 center point', 'x: ' + str(x1_center), 'y: ' + str(y1_center))
                     print ('Box 2 center point', 'x: ' + str(x2_center), 'y: ' + str(y2_center))
