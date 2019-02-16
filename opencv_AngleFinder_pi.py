@@ -26,22 +26,12 @@ def extra_processing(pipeline):
         widths.append(w)
         heights.append(h)
 
-    # Publish to the '/vision/red_areas' network table
-
+    #Only calculates angle if 2 boxes are found
 
     if len(heights) == 2:
 
-        '''
-        print ('Box 1 center point', 'x: ' + str(center_x_positions[0]), 'y: ' + str(center_y_positions[0]))
-        print ('Box 2 center point', 'x: ' + str(center_x_positions[1]), 'y: ' + str(center_y_positions[1]))
-        print ('Box 1 width: ' + str(widths[0]), 'Box 2 width: ' + str(widths[1]))
-        print ('Box 1 height: ' + str(heights[0]), 'Box 2 height: ' + str(heights[1]))
-        '''
-
         midpoint = ((center_x_positions[0] + center_x_positions[1])/2)
         distance = abs(midpoint - (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx))
-
-        #print ('distance', distance)
 
         angle = 35 * distance / (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx)
 
@@ -60,34 +50,27 @@ def main():
     haveAngle = False
 
     frame_print = 1
-    #camera_used = input ("Which camera do you want to use? ")
 
-    #print('Initializing NetworkTables')
     cond = threading.Condition()
     notified = [False]
 
     def connectionListener(connected, info):
-        #print(info, '; Connected=%s' % connected)
         with cond:
             notified[0] = True
             cond.notify()
 
+
+    #Initializing and connecting to network tables
     NetworkTables.initialize(server='10.4.67.23')
     NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
     with cond:
-        #print("Waiting")
         if not notified[0]:
             cond.wait()
 
-    # Insert your processing code here
-    #print("Connected!")
-
     table = NetworkTables.getTable('vision')
     
-
-    #print('Creating video capture')
-    #cap = cv2.VideoCapture(int(camera_used))
+    #Creating video capture
     while True:
         try:
             cap = cv2.VideoCapture('http://localhost:1181/stream.mjpg')
@@ -102,7 +85,8 @@ def main():
 
     cap.open('http://localhost:1181/stream.mjpg')
 
-    
+
+    #Putting angle and haveAngle to network tables is camera is opened and it gets a frame
     while cap.isOpened():
         
         frame_number = frame_number + 1
