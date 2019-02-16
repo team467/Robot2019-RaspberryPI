@@ -57,7 +57,7 @@ def extra_processing(pipeline):
 def main():
 
     turning_angle = 0 
-    haveAngle = True
+    haveAngle = False
 
     frame_print = 1
     #camera_used = input ("Which camera do you want to use? ")
@@ -88,74 +88,43 @@ def main():
 
     #print('Creating video capture')
     #cap = cv2.VideoCapture(int(camera_used))
-    cap = cv2.VideoCapture('http://localhost:1181/stream.mjpg')
-    #print ('camera found')
+    while True:
+        try:
+            cap = cv2.VideoCapture('http://localhost:1181/stream.mjpg')
+            break
+        except:
+            pass
+
+   
 
     frame_number = 0
-
-    if not cap.isOpened():
-        try:
-            cap.open('http://localhost:1181/stream.mjpg')
-        except:
-            sys.exc_info()[0]
-
-    #print('Creating pipeline')
     pipeline = TapeRecognitionCode()
 
-    #print('Running pipeline')
-    while cap.isOpened():
+    cap.open('http://localhost:1181/stream.mjpg')
 
-        frame_number = frame_number + 1
-
-        #print ("in while loop")
-        have_frame, frame = cap.read()
-
-        if have_frame:
-            #time1 = time.clock() * 1000
-            #print ("in if")
-            pipeline.process(frame)
-            if pipeline is not None:
-                turning_angle, haveAngle = extra_processing(pipeline)
-
-                table.putBoolean('have angle', haveAngle)
-                table.putNumber('angle', turning_angle)
-
-                if frame_number%int(frame_print) == 0:
-
-                    #height, width, channels = cv2.imread(frame).shape
-                    #print('frame width = ' + cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                    #print("frame width : %d" % cap.get(cv2.CV_CAP_PROP_FRAME_WIDTH))
-                    '''
-                    print('__cv_resize_dsize')
-                    print(pipeline.__cv_resize_dsize)
-                    print('__cv_resize_src')
-                    print(pipeline.__cv_resize_src)
-                    print ('resize_output')
-                    
-                    print('frame width = ' + str(frame))
-                    print (pipeline._TapeRecognitionCode__cv_resize_src)
-                    
-                    
-                    print (frame_number/int(frame_print))
-                    print ('Box 1 center point', 'x: ' + str(x1_center), 'y: ' + str(y1_center))
-                    print ('Box 2 center point', 'x: ' + str(x2_center), 'y: ' + str(y2_center))
-                    print ('Box 1 width: ' + str(width1), 'Box 2 width: ' + str(width2))
-                    print ('Box 1 height: ' + str(height1), 'Box 2 height: ' + str(height2))
-                    '''
-                    
-                    #print ('Angle = ' + str(turning_angle))
-                else:
-                    haveAngle = False
-                    table.putBoolean('have angle', haveAngle)
-
-
-            #time2 = time.clock() * 1000
-
-            #print (time2 - time1)
     
-    cap.release()
+    while cap.isOpened():
+        
+        frame_number = frame_number + 1
+        have_frame, frame = cap.read()
+        try:
+            if have_frame:
+                
+                pipeline.process(frame)
+                if pipeline is not None:
+                    turning_angle, haveAngle = extra_processing(pipeline)
 
-    print('Capture closed')
+                    table.putBoolean('haveAngle', haveAngle)
+                    table.putNumber('angle', turning_angle)
+
+            elif cap.get(cv2.CAP_PROP_FPS) == 0:
+                haveAngle = False
+                table.putBoolean('haveAngle', haveAngle)
+        except:
+            haveAngle = False
+            table.putBoolean('haveAngle', haveAngle)
+        
+    cap.release()
 
 if __name__ == '__main__':
     main()
