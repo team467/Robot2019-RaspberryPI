@@ -91,22 +91,17 @@ def main():
         
         frame_number = frame_number + 1
         have_frame, frame = cap.read()
-        try:
-            if have_frame:
-                
-                pipeline.process(frame)
-                if pipeline is not None:
-                    turning_angle, haveAngle = extra_processing(pipeline)
+        if have_frame:
+            
+            pipeline.process(frame)
+            if pipeline is not None:
+                turning_angle, haveAngle = extra_processing(pipeline)
 
-                    table.putBoolean('haveAngle', haveAngle)
-                    table.putNumber('angle', turning_angle)
-
-            elif cap.get(cv2.CAP_PROP_FPS) == 0:
-                haveAngle = False
                 table.putBoolean('haveAngle', haveAngle)
-        except:
-            haveAngle = False
-            table.putBoolean('haveAngle', haveAngle)
+                table.putNumber('angle', turning_angle)
+
+        
+        
         
     cap.release()
 
