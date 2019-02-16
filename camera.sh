@@ -11,6 +11,8 @@ do
   x=$x+1
 done
 
+sleep 30
+
 while true
 do
   sudo python camera.py ${order[1]} ${order[0]} ${order[2]} ${order[3]}
