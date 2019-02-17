@@ -22,11 +22,11 @@ def isHatch(frame):
     mask = mask1 + mask2
     res = cv2.bitwise_and(frame, frame, mask = mask)
     #frcv2.imshow('hatch', res)
-    #cv2.imshow('hatch detection', frame)
-    (contoursG, a) = cv2.findContours(mask, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    (contours, b) = cv2.findContours(mask2, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    cv2.imshow('hatch detection', frame)
+    (contours, a) = cv2.findContours(mask1, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    (contoursG, b) = cv2.findContours(mask2, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     image = frame
-    ci = 0
+    ci = 0 
     hatch = False
     for c in contours:
         ci = ci + 1
@@ -51,5 +51,9 @@ def isHatch(frame):
            # cv2.destroyAllWindows()
            # break
 
-
+#while True:
+#    cap = cv2.VideoCapture("http://10.0.1.112:1181/stream.mjpg")
+#    _, f = cap.read()
+#    print(isHatch(f))
+    
     
