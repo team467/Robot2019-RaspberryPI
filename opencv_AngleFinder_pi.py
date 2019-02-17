@@ -1,4 +1,3 @@
-import time
 import cv2
 from networktables import *
 from grip import TapeRecognitionCode
@@ -133,8 +132,11 @@ def main():
                 else:
                     firing_range_cargo = False
                     table.putBoolean('FiringRange_Cargo', firing_range_cargo)
+                    
+        if frame_number%60 == 0:
             IsHatch = isHatch(frame)
-            table.putBoolean('hatch', IsHatch)
+
+        table.putBoolean('hatch', IsHatch)
 
     cap.release()
 
