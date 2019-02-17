@@ -149,7 +149,6 @@ def main():
         #getting if hatch is detected or not
         if frame_number%HatchDetectionInterval == 0:
             IsHatch = isHatch(frame)
-            print (IsHatch)
 
         table.putBoolean('hatch', IsHatch)
 
