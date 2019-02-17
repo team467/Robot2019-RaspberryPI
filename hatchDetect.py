@@ -4,7 +4,7 @@ import math
 
 def isHatch(frame):
     #cap = frame
-    cap = cv2.VideoCapture("http://10.0.1.112:1181/stream.mjpg")
+    #cv2.VideoCapture("http://10.0.1.112:1181/stream.mjpg")
     #cap = cv2.VideoCapture(0)
     #20, 120, 120
     #50, 255, 255
@@ -14,7 +14,7 @@ def isHatch(frame):
     upper_grey = np.array([120, 130, 130])
     
     #hatch = False
-    check, frame = cap.read()
+    #check, frame = cap.read()
     #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     blur = cv2.blur(frame,(8, 8))
     mask1 = cv2.inRange(blur, lower_yellow, upper_yellow)
@@ -29,18 +29,21 @@ def isHatch(frame):
     ci = 0 
     hatch = False
     for c in contours:
+        #print('Found some contours')
         ci = ci + 1
         area = cv2.contourArea(c)
         rect = cv2.boundingRect(c)
         x,y,w,h = rect
         if area > 300:
             for c2 in contoursG:
+                #print("found some gray contours")
                 areaG = cv2.contourArea(c2)
                 rectG = cv2.boundingRect(c2)
                 xG, yG, wG, hG = rectG
                 if areaG > 100:
                     if xG > x and x+w > xG+wG and yG > y and y+h > yG+hG:
                         hatch = True
+                        return hatch
                         #cv2.imshow('hatch', res)
             #cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),1)
         
