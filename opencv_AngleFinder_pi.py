@@ -5,6 +5,7 @@ from grip import TapeRecognitionCode
 import threading
 from ctypes import *
 import sys
+from hatchDetect import isHatch
 
 def extra_processing(pipeline):
     """
@@ -39,10 +40,9 @@ def extra_processing(pipeline):
         midpoint = ((center_x_positions[0] + center_x_positions[1])/2.0)
         distance = abs(midpoint - (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx))
 
-        averageWidth = (widths[0] + widths[1])/2.0
-
         #Distance from the reflective tape in inches
         if  abs(widths[0] - widths[1]) <= (0.3 * biggerWidth):
+            averageWidth = (widths[0] + widths[1])/2.0
             distanceFromTarget = 12.0 * (4.6 - ((2.0/15.0) * averageWidth))
         else:
             distanceFromTarget = sys.maxint
@@ -53,6 +53,7 @@ def extra_processing(pipeline):
             angle = angle * -1
         have_angle = True
     else:
+        distanceFromTarget = sys.maxint
         angle = sys.maxint
         have_angle = False
     
@@ -68,6 +69,7 @@ def main():
     firing_range_cargo = False
     cargoRange = 24
     hatchRange = 24
+    IsHatch = False
 
     cond = threading.Condition()
     notified = [False]
@@ -131,6 +133,8 @@ def main():
                 else:
                     firing_range_cargo = False
                     table.putBoolean('FiringRange_Cargo', firing_range_cargo)
+            IsHatch = isHatch(frame)
+            table.putBoolean('hatch', IsHatch)
 
     cap.release()
 
