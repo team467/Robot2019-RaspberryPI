@@ -132,9 +132,10 @@ def main():
                 else:
                     firing_range_cargo = False
                     table.putBoolean('FiringRange_Cargo', firing_range_cargo)
-                    
+
         if frame_number%60 == 0:
             IsHatch = isHatch(frame)
+            print (IsHatch)
 
         table.putBoolean('hatch', IsHatch)
 
