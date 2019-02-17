@@ -14,7 +14,7 @@ def isHatch(frame):
     upper_grey = np.array([120, 130, 130])
     
     #hatch = False
-    #check, frame = cap.read()
+    check, frame = cap.read()
     #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     blur = cv2.blur(frame,(8, 8))
     mask1 = cv2.inRange(blur, lower_yellow, upper_yellow)
