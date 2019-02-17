@@ -4,7 +4,7 @@ import math
 
 def isHatch(frame):
     #cap = frame
-    #cv2.VideoCapture("http://10.0.1.112:1181/stream.mjpg")
+    cap = cv2.VideoCapture("http://10.0.1.112:1181/stream.mjpg")
     #cap = cv2.VideoCapture(0)
     #20, 120, 120
     #50, 255, 255
