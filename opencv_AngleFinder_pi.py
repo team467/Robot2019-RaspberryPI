@@ -16,9 +16,9 @@ def extra_processing(pipeline):
     center_y_positions = []
     widths = []
     heights = []
-    angle = 0
-    frame_width_midpt = 80
-    distanceFromTarget = 0
+    angle = 0 #angle for the turret to turn in degrees
+    frame_width_midpt = 80 #midpoint of frame output from camera server
+    distanceFromTarget = 0 #distance from target in inches
     # Find the bounding boxes of the contours to get x, y, width, and height
     for contour in pipeline.filter_contours_output:
         x, y, w, h = cv2.boundingRect(contour)
@@ -31,12 +31,16 @@ def extra_processing(pipeline):
 
     if len(heights) == 2:
 
+        #getting larger width
         if widths[0] > widths[1]:
             biggerWidth = widths[0]
         else:
             biggerWidth = widths[1]
 
+        #midpoint between the bounding boxes
         midpoint = ((center_x_positions[0] + center_x_positions[1])/2.0)
+
+        #offset of midpoint from the center of the frame
         distance = abs(midpoint - (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx))
 
         #Distance from the reflective tape in inches
@@ -46,8 +50,10 @@ def extra_processing(pipeline):
         else:
             distanceFromTarget = sys.maxint
 
+        #calculating angle
         angle = 35 * distance / (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx)
 
+        #deciding whether angle should be positive (clockwise turn) or negative (counterclockwise turn)
         if midpoint < (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx):
             angle = angle * -1
         have_angle = True
@@ -60,15 +66,15 @@ def extra_processing(pipeline):
 
 def main():
 
-    turning_angle = 0 
-    haveAngle = False
-    distance_from_target = 0
-    frame_print = 1
-    firing_range_hatch = False
-    firing_range_cargo = False
-    cargoRange = 24
-    hatchRange = 24
-    IsHatch = False
+    turning_angle = 0 #gives angle for the turret to turn to vision tape in degrees
+    haveAngle = False #says whether an angle for the turret to turn to the vision tape is detected or not
+    distance_from_target = 0 #distance from the target in inches, changes later in the program
+    firing_range_hatch = False #says whether robot is in range to fire hatch
+    firing_range_cargo = False #says whether robot is in range to fire cargo
+    cargoRange = 24 #max firing range for cargo in inches
+    hatchRange = 24 #max firing range for hatch in inches
+    IsHatch = False #says whether a hatch was detected or not
+    HatchDetectionInterval = 60 #the amount of frames between each reading of the hatch
 
     cond = threading.Condition()
     notified = [False]
@@ -109,16 +115,23 @@ def main():
     while cap.isOpened():
         
         frame_number = frame_number + 1
+
+        #reading frame from camera
         have_frame, frame = cap.read()
+
         if have_frame:
             
             pipeline.process(frame)
             if pipeline is not None:
+
+                #getting values being returned from extra_proccesing
                 turning_angle, haveAngle, distance_from_target = extra_processing(pipeline)
 
+                #putting haveAngle and angle to network tables
                 table.putBoolean('haveAngle', haveAngle)
                 table.putNumber('angle', turning_angle)
 
+                #deciding if robot is within firing range and putting values to network tables
                 if distance_from_target < hatchRange:
                     firing_range_hatch = True
                     table.putBoolean('FiringRange_Hatch', firing_range_hatch)
@@ -133,7 +146,8 @@ def main():
                     firing_range_cargo = False
                     table.putBoolean('FiringRange_Cargo', firing_range_cargo)
 
-        if frame_number%60 == 0:
+        #getting if hatch is detected or not
+        if frame_number%HatchDetectionInterval == 0:
             IsHatch = isHatch(frame)
             print (IsHatch)
 
