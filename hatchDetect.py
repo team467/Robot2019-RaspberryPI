@@ -22,7 +22,7 @@ def isHatch(frame):
     mask = mask1 + mask2
     res = cv2.bitwise_and(frame, frame, mask = mask)
     #frcv2.imshow('hatch', res)
-    cv2.imshow('hatch detection', frame)
+    #cv2.imshow('hatch detection', frame)
     (contours, a) = cv2.findContours(mask1, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     (contoursG, b) = cv2.findContours(mask2, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     image = frame
