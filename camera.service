@@ -1,0 +1,11 @@
+[Unit]
+Description=CameraSwitcher
+After=multi-user.target
+ 
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/bin/camera.sh
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target

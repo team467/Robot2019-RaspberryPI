@@ -12,4 +12,16 @@ sudo chmod +x *
 ./pynetworktables.sh
 cd ~/
 sudo rm -r Robot2019-RaspberryPI
-sudo mv camera.sh /etc/init.d/
+sudo mv camera.sh /usr/bin/
+sudo chmod +x /usr/bin/camera.sh
+sudo chmod +x opencv_AngleFinder_pi.py
+sudo mv camera.service /lib/systemd/system/
+sudo mv angleFinder.service /lib/systemd/system/
+sudo chmod 644 /lib/systemd/system/camera.service
+sudo chmod 644 /lib/systemd/system/angleFinder.service
+cd /lib/systemd/system/
+sudo systemctl enable camera.service
+sudo systemctl enable angleFinder.service
+sudo systemctl start camera.service
+sudo systemctl start angleFinder.service
+cd ~/
