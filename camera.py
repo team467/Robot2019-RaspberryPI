@@ -5,6 +5,10 @@ import threading
 from networktables import NetworkTables
 import subprocess
 import sys
+import time
+
+print("Starting")
+time.sleep(0)
 
 cond = threading.Condition()
 notified = [False]
@@ -38,8 +42,15 @@ def camera_switcher(cameraNum):
 
 prev = 0
 subprocess.call(["ln", "-sfn", "/dev/video0", "/home/vid"])
+table.putNumber('camera', 0)
+table.putBoolean('reset', False)
 
 while True:
     if int(table.getNumber('camera', 0)) != prev and 0 <= int(table.getNumber('camera', 0)) <= 3:
         subprocess.call(camera_switcher(int(table.getNumber('camera', 0))))
         prev = int(table.getNumber('camera', 0))
+        subprocess.call(["echo", "Got " + str(table.getNumber('camera',0))])
+
+    if table.getBoolean('reset', False):
+        table.putBoolean('reset', False)
+        sys.exit()

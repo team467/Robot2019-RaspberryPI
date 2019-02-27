@@ -1,10 +1,10 @@
-import keyboard
-import time
 import cv2
 from networktables import *
 from grip import TapeRecognitionCode
 import threading
 from ctypes import *
+import sys
+from hatchDetect import isHatch
 
 def extra_processing(pipeline):
     """
@@ -16,7 +16,9 @@ def extra_processing(pipeline):
     center_y_positions = []
     widths = []
     heights = []
-    angle = 0
+    angle = 0 #angle for the turret to turn in degrees
+    frame_width_midpt = 80 #midpoint of frame output from camera server
+    distanceFromTarget = 0 #distance from target in inches
     # Find the bounding boxes of the contours to get x, y, width, and height
     for contour in pipeline.filter_contours_output:
         x, y, w, h = cv2.boundingRect(contour)
@@ -25,105 +27,132 @@ def extra_processing(pipeline):
         widths.append(w)
         heights.append(h)
 
-    # Publish to the '/vision/red_areas' network table
-
+    #Only calculates angle if 2 boxes are found
 
     if len(heights) == 2:
 
-        '''
-        print ('Box 1 center point', 'x: ' + str(center_x_positions[0]), 'y: ' + str(center_y_positions[0]))
-        print ('Box 2 center point', 'x: ' + str(center_x_positions[1]), 'y: ' + str(center_y_positions[1]))
-        print ('Box 1 width: ' + str(widths[0]), 'Box 2 width: ' + str(widths[1]))
-        print ('Box 1 height: ' + str(heights[0]), 'Box 2 height: ' + str(heights[1]))
-        '''
+        #getting larger width
+        if widths[0] > widths[1]:
+            biggerWidth = widths[0]
+        else:
+            biggerWidth = widths[1]
 
-        midpoint = ((center_x_positions[0] + center_x_positions[1])/2)
-        distance = abs(midpoint - (350* pipeline._TapeRecognitionCode__cv_resize_fx))
+        #midpoint between the bounding boxes
+        midpoint = ((center_x_positions[0] + center_x_positions[1])/2.0)
 
-        #print ('distance', distance)
+        #offset of midpoint from the center of the frame
+        distance = abs(midpoint - (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx))
 
-        angle = 35 * distance / (350* pipeline._TapeRecognitionCode__cv_resize_fx)
+        #Distance from the reflective tape in inches
+        if  abs(widths[0] - widths[1]) <= (0.3 * biggerWidth):
+            averageWidth = (widths[0] + widths[1])/2.0
+            distanceFromTarget = 12.0 * (4.6 - ((2.0/15.0) * averageWidth))
+        else:
+            distanceFromTarget = sys.maxint
 
-        if midpoint < (350* pipeline._TapeRecognitionCode__cv_resize_fx):
+        #calculating angle
+        angle = 35 * distance / (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx)
+
+        #deciding whether angle should be positive (clockwise turn) or negative (counterclockwise turn)
+        if midpoint < (frame_width_midpt * pipeline._TapeRecognitionCode__cv_resize_fx):
             angle = angle * -1
+        have_angle = True
+    else:
+        distanceFromTarget = sys.maxint
+        angle = sys.maxint
+        have_angle = False
     
-    return angle
+    return angle, have_angle, distanceFromTarget 
 
 def main():
 
-    turning_angle = 0 
+    turning_angle = 0 #gives angle for the turret to turn to vision tape in degrees
+    haveAngle = False #says whether an angle for the turret to turn to the vision tape is detected or not
+    distance_from_target = 0 #distance from the target in inches, changes later in the program
+    firing_range_hatch = False #says whether robot is in range to fire hatch
+    firing_range_cargo = False #says whether robot is in range to fire cargo
+    cargoRange = 24 #max firing range for cargo in inches
+    hatchRange = 24 #max firing range for hatch in inches
+    IsHatch = False #says whether a hatch was detected or not
+    HatchDetectionInterval = 60 #the amount of frames between each reading of the hatch
 
-    frame_print = input ("How many frames do you want? ")
-    camera_used = input ("Which camera do you want to use? ")
-
-    print('Initializing NetworkTables')
     cond = threading.Condition()
     notified = [False]
 
     def connectionListener(connected, info):
-        print(info, '; Connected=%s' % connected)
         with cond:
             notified[0] = True
             cond.notify()
 
+
+    #Initializing and connecting to network tables
     NetworkTables.initialize(server='10.4.67.23')
     NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
     with cond:
-        print("Waiting")
         if not notified[0]:
             cond.wait()
 
-    # Insert your processing code here
-    print("Connected!")
-
     table = NetworkTables.getTable('vision')
     
+    #Creating video capture
+    while True:
+        try:
+            cap = cv2.VideoCapture('http://localhost:1181/stream.mjpg')
+            break
+        except:
+            pass
 
-    print('Creating video capture')
-    cap = cv2.VideoCapture(int(camera_used))
-    #cap = cv2.VideoCapture('/dev/video0')
+   
+
     frame_number = 0
-
-    print('Creating pipeline')
     pipeline = TapeRecognitionCode()
 
-    print('Running pipeline')
-    while cap.isOpened():
+    cap.open('http://localhost:1181/stream.mjpg')
 
+
+    #Putting angle and haveAngle to network tables is camera is opened and it gets a frame
+    while cap.isOpened():
+        
         frame_number = frame_number + 1
 
-        #print ("in while loop")
+        #reading frame from camera
         have_frame, frame = cap.read()
 
         if have_frame:
-            #time1 = time.clock() * 1000
-            #print ("in if")
+            
             pipeline.process(frame)
             if pipeline is not None:
-                turning_angle = extra_processing(pipeline)
 
+                #getting values being returned from extra_proccesing
+                turning_angle, haveAngle, distance_from_target = extra_processing(pipeline)
+
+                #putting haveAngle and angle to network tables
+                table.putBoolean('haveAngle', haveAngle)
                 table.putNumber('angle', turning_angle)
 
-                if frame_number%int(frame_print) == 0:
+                #deciding if robot is within firing range and putting values to network tables
+                if distance_from_target < hatchRange:
+                    firing_range_hatch = True
+                    table.putBoolean('FiringRange_Hatch', firing_range_hatch)
+                else:
+                    firing_range_hatch = False
+                    table.putBoolean('FiringRange_Hatch', firing_range_hatch)
 
-                    '''
-                    print (frame_number/int(frame_print))
-                    print ('Box 1 center point', 'x: ' + str(x1_center), 'y: ' + str(y1_center))
-                    print ('Box 2 center point', 'x: ' + str(x2_center), 'y: ' + str(y2_center))
-                    print ('Box 1 width: ' + str(width1), 'Box 2 width: ' + str(width2))
-                    print ('Box 1 height: ' + str(height1), 'Box 2 height: ' + str(height2))
-                    '''
-                    
-                    print ('Angle = ' + str(turning_angle))
+                if distance_from_target < cargoRange:
+                    firing_range_cargo = True
+                    table.putBoolean('FiringRange_Cargo', firing_range_cargo)
+                else:
+                    firing_range_cargo = False
+                    table.putBoolean('FiringRange_Cargo', firing_range_cargo)
 
-            #time2 = time.clock() * 1000
+        #getting if hatch is detected or not
+        if frame_number%HatchDetectionInterval == 0:
+            IsHatch = isHatch(frame)
 
-            #print (time2 - time1)
-    
+        table.putBoolean('hatch', IsHatch)
+
     cap.release()
-
-    print('Capture closed')
 
 if __name__ == '__main__':
     main()
