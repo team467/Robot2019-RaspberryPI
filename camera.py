@@ -44,6 +44,7 @@ prev = 0
 subprocess.call(["ln", "-sfn", "/dev/video0", "/home/vid"])
 table.putNumber('camera', 0)
 table.putBoolean('reset', False)
+table.putNumber('total', sys.argv[5])
 
 while True:
     if int(table.getNumber('camera', 0)) != prev and 0 <= int(table.getNumber('camera', 0)) <= 3:
