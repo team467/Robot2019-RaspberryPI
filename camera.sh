@@ -15,5 +15,5 @@ sleep 30
 
 while true
 do
-  sudo python camera.py ${order[1]} ${order[0]} ${order[2]} ${order[3]}
+  sudo python camera.py ${order[1]} ${order[0]} ${order[2]} ${order[3]} $x+1
 done
