@@ -25,3 +25,5 @@ sudo systemctl enable angleFinder.service
 sudo systemctl start camera.service
 sudo systemctl start angleFinder.service
 cd ~/
+sudo ln -s /dev/video0 /home/vid
+sudo mv frc.json /boot

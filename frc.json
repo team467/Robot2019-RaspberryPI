@@ -1,0 +1,34 @@
+{
+    "cameras": [
+        {
+            "brightness": 69,
+            "exposure": "auto",
+            "fps": 30,
+            "height": 120,
+            "name": "Multicam",
+            "path": "/home/vid",
+            "pixel format": "mjpeg",
+            "stream": {
+                "properties": [
+                    {
+                        "name": "width",
+                        "value": 160
+                    },
+                    {
+                        "name": "height",
+                        "value": 120
+                    },
+                    {
+                        "name": "fps",
+                        "value": 30
+                    }
+                ]
+            },
+            "white balance": 0,
+            "width": 160
+        }
+    ],
+    "ntmode": "client",
+    "switched cameras": [],
+    "team": 467
+}
