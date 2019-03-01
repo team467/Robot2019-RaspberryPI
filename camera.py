@@ -19,7 +19,7 @@ def connectionListener(connected, info):
         notified[0] = True
         cond.notify()
 
-NetworkTables.initialize(server='10.4.67.23')
+NetworkTables.initialize(server='10.4.67.2')
 NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
 with cond:
