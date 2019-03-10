@@ -8,7 +8,7 @@ def isHatch(frame):
     #cap = cv2.VideoCapture(0)
     #20, 120, 120
     #50, 255, 255
-    lower_yellow = np.array([20, 110, 110])
+    lower_yellow = np.array([5, 110, 110])
     upper_yellow = np.array([100, 255, 255])
     lower_grey = np.array([80, 90, 90])
     upper_grey = np.array([120, 130, 130])
