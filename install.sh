@@ -10,6 +10,7 @@ cd scripts
 sudo chmod +x *
 ./lsm9ds1.sh
 ./pynetworktables.sh
+./vision
 cd ~/
 sudo rm -r Robot2019-RaspberryPI
 sudo mv camera.sh /usr/bin/
