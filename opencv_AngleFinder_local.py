@@ -1,4 +1,3 @@
-import keyboard
 import cv2
 #from networktables import NetworkTables
 from grip import TapeRecognitionCode
