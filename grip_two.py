@@ -50,17 +50,17 @@ class TapeRecCodeTwo:
         self.find_contours_output = None
 
         self.__filter_contours_contours = self.find_contours_output
-        self.__filter_contours_min_area = 0
+        self.__filter_contours_min_area = 0.0
         self.__filter_contours_min_perimeter = 1000.0
-        self.__filter_contours_min_width = 0
-        self.__filter_contours_max_width = 1000
-        self.__filter_contours_min_height = 0
-        self.__filter_contours_max_height = 1000
+        self.__filter_contours_min_width = 0.0
+        self.__filter_contours_max_width = 1000.0
+        self.__filter_contours_min_height = 0.0
+        self.__filter_contours_max_height = 1000.0
         self.__filter_contours_solidity = [0, 100]
-        self.__filter_contours_max_vertices = 1000000
-        self.__filter_contours_min_vertices = 0
-        self.__filter_contours_min_ratio = 0
-        self.__filter_contours_max_ratio = 1000
+        self.__filter_contours_max_vertices = 1000000.0
+        self.__filter_contours_min_vertices = 0.0
+        self.__filter_contours_min_ratio = 0.0
+        self.__filter_contours_max_ratio = 1000.0
 
         self.filter_contours_output = None
 
@@ -188,7 +188,7 @@ class TapeRecCodeTwo:
         else:
             mode = cv2.RETR_LIST
         method = cv2.CHAIN_APPROX_SIMPLE
-        im2, contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
+        contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
         return contours
 
     @staticmethod
