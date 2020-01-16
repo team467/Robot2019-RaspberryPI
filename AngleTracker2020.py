@@ -51,7 +51,7 @@ def extra_processing(cap, pipeline3, frame):
 
                 boundingCenterX = ((x+x+w)/2)
                 frameCenterX = cap.get(int((cv2.CAP_PROP_FRAME_WIDTH)/2))
-                distanceFromCenterFrameInches = (boundingCenterX - frameCenterX) * (39.25/w)
+                distanceFromCenterFrameInches = (frameCenterX - boundingCenterX) * (39.25/w)
 
                 #print(distanceFromCenterFrameInches)
 
