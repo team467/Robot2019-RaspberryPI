@@ -1,7 +1,17 @@
 import cv2
 
-cap = cv2.VideoCapture(1)
 
+def change_res(width, height):
+    cap.set(3, width)
+    cap.set(4, height)
+
+
+cap = cv2.VideoCapture(1)
+change_res(1280, 720)
+frame_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+frame_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+print("Frame width: ", frame_width)
+print("Frame height: ", frame_height)
 while True:
     ret, frame = cap.read()
     cv2.imshow("frame", frame)
