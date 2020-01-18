@@ -6,7 +6,7 @@ def change_res(width, height):
     cap.set(4, height)
 
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(2)
 change_res(1280, 720)
 frame_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 frame_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)

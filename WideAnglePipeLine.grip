@@ -76,7 +76,7 @@
     </grip:Step>
     <grip:Step name="Convex Hulls">
       <grip:Input step="3" socket="0"/>
-      <grip:Output step="3" socket="0" previewed="false"/>
+      <grip:Output step="3" socket="0" previewed="true"/>
     </grip:Step>
   </steps>
   <connections>
@@ -87,6 +87,10 @@
     <grip:Connection>
       <grip:Output step="1" socket="0" previewed="true"/>
       <grip:Input step="2" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="2" socket="0" previewed="true"/>
+      <grip:Input step="3" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output source="0" socket="0" previewed="false"/>
@@ -106,7 +110,7 @@
     <language>Python</language>
     <className>WideAngleGripFinal</className>
     <implementWpilibPipeline>false</implementWpilibPipeline>
-    <saveDir>C:\Users\William\GRIP</saveDir>
+    <saveDir>C:\Users\theak\Documents\Akash\Robotics\Robot_Programs\Competition\Robot2019-RaspberryPI</saveDir>
     <packageName>bob</packageName>
     <moduleName>grip_wideangle</moduleName>
   </codeGenerationSettings>

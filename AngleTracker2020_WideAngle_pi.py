@@ -1,11 +1,11 @@
 import cv2
-#from networktables import NetworkTables
+from networktables import NetworkTables
 #from grip_two import TapeRecCodeTwo
 #from grip_three_convexhull import TapeRecCodeThree
 from grip_wideangle import WideAngleGripFinal
 from math import *
 
-def extra_processing(cap, pipeline, frame):
+def extra_processing(cap, pipeline4, frame):
     """
     Performs extra processing on the pipeline's outputs and publishes data to NetworkTables.
     :param pipeline: the pipeline that just processed an image
@@ -27,9 +27,11 @@ def extra_processing(cap, pipeline, frame):
     lh = 0
  
     # Find the bounding boxes of the contours to get x, y, width, and height
-    # print(len(pipeline.filter_contours_output))
+    # print(len(pipeline4.filter_contours_output))
 
-    for contour in pipeline.filter_contours_output:
+
+
+    for contour in pipeline4.filter_contours_output:
 
         x, y, w, h = cv2.boundingRect(contour)
 
@@ -91,15 +93,19 @@ def change_res(cap, width, height):
 
 def main():
    
-    pipeline = WideAngleGripFinal()
-    cap = cv2.VideoCapture(1)
+    pipeline4 = WideAngleGripFinal()
+    cap = cv2.VideoCapture(0)
     change_res(cap, 1080, 720)
     frame_count = 0
+    frame_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    frame_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    print(frame_width)
+    print(frame_height)
     while True:
         have_frame, frame = cap.read()
         if have_frame:
-            pipeline.process(frame)
-            extra_processing(cap, pipeline, frame)
+            pipeline4.process(frame)
+            extra_processing(cap, pipeline4, frame)
             # cv2.imshow("frame", frame)
             frame_count += 1
 
