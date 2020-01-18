@@ -1,11 +1,11 @@
 import cv2
 #from networktables import NetworkTables
-from grip_two import TapeRecCodeTwo
-from grip_three_convexhull import TapeRecCodeThree
-#from grip import WideAngleGrip
+#from grip_two import TapeRecCodeTwo
+#from grip_three_convexhull import TapeRecCodeThree
+from grip_wideangle import WideAngleGripFinal
 from math import *
 
-def extra_processing(cap, pipeline3, frame):
+def extra_processing(cap, pipeline, frame):
     """
     Performs extra processing on the pipeline's outputs and publishes data to NetworkTables.
     :param pipeline: the pipeline that just processed an image
@@ -27,9 +27,9 @@ def extra_processing(cap, pipeline3, frame):
     lh = 0
  
     # Find the bounding boxes of the contours to get x, y, width, and height
-    # print(len(pipeline3.filter_contours_output))
+    # print(len(pipeline.filter_contours_output))
 
-    for contour in pipeline3.filter_contours_output:
+    for contour in pipeline.filter_contours_output:
 
         x, y, w, h = cv2.boundingRect(contour)
 
@@ -83,17 +83,6 @@ def extra_processing(cap, pipeline3, frame):
                 print("Angle: {}".format(angleDeg))
 
 
-        
-
-    # if len(pipeline3.filter_contours_output) > 1:
-        # cv2.imshow("frame", frame)
-
-    # if len(pipeline3.filter_contours_output) == 1:
-    #     cv2.imshow("frame", frame)
-
-    # if (len(widths) == 1) and (len(heights) == 1):
-        # do angle calculations here
-
 
 def change_res(cap, width, height):
     cap.set(3, width)
@@ -101,16 +90,16 @@ def change_res(cap, width, height):
 
 
 def main():
-    pipeline2 = TapeRecCodeTwo()
-    pipeline3 = TapeRecCodeThree()
+   
+    pipeline = WideAngleGripFinal()
     cap = cv2.VideoCapture(1)
     change_res(cap, 1080, 720)
     frame_count = 0
     while True:
         have_frame, frame = cap.read()
         if have_frame:
-            pipeline3.process(frame)
-            extra_processing(cap, pipeline3, frame)
+            pipeline.process(frame)
+            extra_processing(cap, pipeline, frame)
             # cv2.imshow("frame", frame)
             frame_count += 1
 

@@ -1,0 +1,113 @@
+<grip:Pipeline>
+  <sources>
+    <grip:Camera>
+      <property name="deviceNumber" value="1"/>
+    </grip:Camera>
+  </sources>
+  <steps>
+    <grip:Step name="RGB Threshold">
+      <grip:Input step="0" socket="0"/>
+      <grip:Input step="0" socket="1">
+        <value>
+          <double>208.67805755395682</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="2">
+        <value>
+          <double>204.09172661870502</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="3">
+        <value>
+          <double>224.73021582733813</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Output step="0" socket="0" previewed="true"/>
+    </grip:Step>
+    <grip:Step name="Find Contours">
+      <grip:Input step="1" socket="0"/>
+      <grip:Input step="1" socket="1">
+        <value>false</value>
+      </grip:Input>
+      <grip:Output step="1" socket="0" previewed="true"/>
+    </grip:Step>
+    <grip:Step name="Filter Contours">
+      <grip:Input step="2" socket="0"/>
+      <grip:Input step="2" socket="1">
+        <value>16.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="2">
+        <value>14.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="3">
+        <value>13.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="4">
+        <value>1000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="5">
+        <value>10.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="6">
+        <value>10000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="7">
+        <value>
+          <double>15.287769784172662</double>
+          <double>24.061433447098977</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="2" socket="8">
+        <value>1000000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="9">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="10">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="11">
+        <value>1000.0</value>
+      </grip:Input>
+      <grip:Output step="2" socket="0" previewed="true"/>
+    </grip:Step>
+    <grip:Step name="Convex Hulls">
+      <grip:Input step="3" socket="0"/>
+      <grip:Output step="3" socket="0" previewed="false"/>
+    </grip:Step>
+  </steps>
+  <connections>
+    <grip:Connection>
+      <grip:Output step="0" socket="0" previewed="true"/>
+      <grip:Input step="1" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="1" socket="0" previewed="true"/>
+      <grip:Input step="2" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="false"/>
+      <grip:Input step="0" socket="0"/>
+    </grip:Connection>
+  </connections>
+  <settings>
+    <teamNumber>0</teamNumber>
+    <publishAddress>roboRIO-0-FRC.local</publishAddress>
+    <deployAddress>roboRIO-0-FRC.local</deployAddress>
+    <deployDir>/home/lvuser</deployDir>
+    <deployUser>lvuser</deployUser>
+    <deployJavaHome>/usr/local/frc/JRE/</deployJavaHome>
+    <deployJvmOptions>-Xmx50m -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:MaxNewSize=16m</deployJvmOptions>
+  </settings>
+  <codeGenerationSettings>
+    <language>Python</language>
+    <className>WideAngleGripFinal</className>
+    <implementWpilibPipeline>false</implementWpilibPipeline>
+    <saveDir>C:\Users\William\GRIP</saveDir>
+    <packageName>bob</packageName>
+    <moduleName>grip_wideangle</moduleName>
+  </codeGenerationSettings>
+</grip:Pipeline>
