@@ -1,9 +1,13 @@
+# This version of AngleTracker2020 is for use on the pi since it uses networktables
+
 import cv2
-from networktables import NetworkTables
+from networktables import *
+import threading
 #from grip_two import TapeRecCodeTwo
 #from grip_three_convexhull import TapeRecCodeThree
 from grip_wideangle import WideAngleGripFinal
 from math import *
+import sys
 
 def extra_processing(cap, pipeline4, frame):
     """
@@ -25,6 +29,8 @@ def extra_processing(cap, pipeline4, frame):
     ly = 0
     lw = 0
     lh = 0
+
+    distanceFromTarget = 0.0
  
     # Find the bounding boxes of the contours to get x, y, width, and height
     # print(len(pipeline4.filter_contours_output))
@@ -68,8 +74,10 @@ def extra_processing(cap, pipeline4, frame):
                 
                 #print(distanceFromCenterFrameInches)
 
-                distanceFromTarget = float((372*46.25)/h)
+                # distanceFromTarget = float((372*46.25)/h)
                 #distanceFromTarget = float((434*41)/h)
+                distanceFromTarget = float((122*150)/h)
+                haveDistance = True
 
                 # we need to find a better ratio using more accurate tests
 
@@ -84,6 +92,13 @@ def extra_processing(cap, pipeline4, frame):
 
                 print("Angle: {}".format(angleDeg))
 
+                haveAngle = True
+        else:
+            haveAngle = False
+            haveDistance = False
+
+    return angleDeg, distanceFromTarget, haveAngle, haveDistance
+
 
 
 def change_res(cap, width, height):
@@ -92,6 +107,25 @@ def change_res(cap, width, height):
 
 
 def main():
+
+    cond = threading.Condition()
+    notified = [False]
+
+    def connectionListener(connected, info):
+        with cond:
+            notified[0] = True
+            cond.notify()
+
+
+    #Initializing and connecting to network tables
+    NetworkTables.initialize(server='10.4.67.23')
+    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+
+    with cond:
+        if not notified[0]:
+            cond.wait()
+
+    table = NetworkTables.getTable('vision')
    
     pipeline4 = WideAngleGripFinal()
     cap = cv2.VideoCapture(0)
@@ -105,7 +139,14 @@ def main():
         have_frame, frame = cap.read()
         if have_frame:
             pipeline4.process(frame)
-            extra_processing(cap, pipeline4, frame)
+            angle, distance, have_angle, have_distance = extra_processing(cap, pipeline4, frame)
+            table.putBoolean("have_angle", have_angle)
+            if have_angle:
+                table.putNumber("angle", angle)
+            table.putBoolean("have_distance", have_distance)
+            if have_distance:
+                table.putNumber("distance", distance)
+
             # cv2.imshow("frame", frame)
             frame_count += 1
 
