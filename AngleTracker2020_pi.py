@@ -53,9 +53,9 @@ def extra_processing(cap, pipeline4, frame):
 
         if float(w/h) >= 2.0:
             if float(w/h) <= 2.3:
-                cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
-                cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
-                cv2.imshow("frame", frame) 
+                # cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
+                # cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
+                # cv2.imshow("frame", frame) 
                 print("h = {}, w = {}, x = {}, y = {}, a = {}".format(h, w, x, y, (w*h)))
 
                 #boundingCenterX = ((x+x+w)/2)

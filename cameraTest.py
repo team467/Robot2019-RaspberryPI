@@ -14,6 +14,7 @@ print("Frame width: ", frame_width)
 print("Frame height: ", frame_height)
 while True:
     ret, frame = cap.read()
-    cv2.imshow("frame", frame)
+    # cv2.imshow("frame", frame)
+    print("frame")
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
