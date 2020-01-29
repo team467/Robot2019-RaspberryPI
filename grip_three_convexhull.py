@@ -196,7 +196,8 @@ class TapeRecCodeThree:
         else:
             mode = cv2.RETR_LIST
         method = cv2.CHAIN_APPROX_SIMPLE
-        contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
+        contours, hierarchy = cv2.findContours(input, mode=mode, method=method)
+        print("contours: {}".format(len(contours)))
         return contours
 
     @staticmethod
@@ -210,6 +211,7 @@ class TapeRecCodeThree:
         output = []
         for contour in input_contours:
             output.append(cv2.convexHull(contour))
+        print("number of convex hulls: {}".format(len(output)))
         return output
 
     @staticmethod
@@ -255,6 +257,7 @@ class TapeRecCodeThree:
             if (ratio < min_ratio or ratio > max_ratio):
                 continue
             output.append(contour)
+        print("number of filtered contours: {}".format(len(output)))
         return output
 
 

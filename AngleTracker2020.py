@@ -2,7 +2,7 @@
 
 import cv2
 #from networktables import NetworkTables
-from grip_two import TapeRecCodeTwo
+# from grip_two import TapeRecCodeTwo
 from grip_three_convexhull import TapeRecCodeThree
 #from grip import WideAngleGrip
 from math import *
@@ -112,7 +112,7 @@ def change_res(cap, width, height):
 
 
 def main():
-    pipeline2 = TapeRecCodeTwo()
+    # pipeline2 = TapeRecCodeTwo()
     pipeline3 = TapeRecCodeThree()
     cap = cv2.VideoCapture(0)
     change_res(cap, 1080, 720)
@@ -124,6 +124,8 @@ def main():
             extra_processing(cap, pipeline3, frame)
             # cv2.imshow("frame", frame)
             frame_count += 1
+
+            print("frame")
 
             # hit q to exit
             if cv2.waitKey(1) & 0xFF == ord("q"):
