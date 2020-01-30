@@ -42,7 +42,8 @@ def extra_processing(cap, pipeline3, frame):
 
         # cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
 
-        center_x_positions.append(x + w / 2)  # X and Y are coordinates of the top-left corner of the bounding box
+        # X and Y are coordinates of the top-left corner of the bounding box
+        center_x_positions.append(x + w / 2)  
         center_y_positions.append(y + h / 2)
         
         topLeftX.append(x)
