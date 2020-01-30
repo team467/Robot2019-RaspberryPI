@@ -57,8 +57,8 @@ def extra_processing(cap, pipeline3, frame):
                 # cv2.imshow("frame", frame) 
                 print("h = {}, w = {}, x = {}, y = {}, a = {}".format(h, w, x, y, (w*h)))
 
-                #boundingCenterX = ((x+x+w)/2)
-                #William made some changes here with the bounding center calcs
+                # boundingCenterX = ((x+x+w)/2)
+                # William made some changes here with the bounding center calcs
                 # if (x > w):
                 #     boundingCenterX = (x + w/2)
                 # elif (x < w):
@@ -84,8 +84,8 @@ def extra_processing(cap, pipeline3, frame):
                 #print(distanceFromCenterFrameInches)
 
                 # distanceFromTarget = float((372*46.25)/h) 
-                #distanceFromTarget = float((434*41)/h)
-                # distanceFromTarget = float(((-50)/151)*h + 186.06623)
+                # distanceFromTarget = float((434*41)/h)
+                # distanceFromTarget = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
                 distanceFromTarget = float((122*150)/h)
                 haveDistance = True
 
@@ -100,7 +100,7 @@ def extra_processing(cap, pipeline3, frame):
                 print("Distance in inches: {}, Distance in feet and inches: {} feet, {} inches".format(int(distanceFromTarget), int(feet), int(inches)))
 
                 angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
-                angleDeg = degrees(angleRad)
+                # angleDeg = degrees(angleRad)
 
 
 
@@ -108,12 +108,12 @@ def extra_processing(cap, pipeline3, frame):
                 # It just makes the angle negative or positive 
                 # We out put the angle as a negative when it is to the left of us.
 
-                """
+            
                 if (frameCenterX < boundingCenterX):
                    angleDeg = degrees(angleRad)
                 elif (frameCenterX > boundingCenterX):
                     angleDeg = degrees(angleRad)*(-1)
-                """
+                
 
                 haveAngle = True
 
