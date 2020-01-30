@@ -72,23 +72,17 @@ def extra_processing(cap, pipeline3, frame):
 
                 # Initializing zero which is dead on
                 distanceFromCenterFrameInches = 0
+
+                # These account for when we are to the left or to the right of the target
                 if (frameCenterX < boundingCenterX):
                    distanceFromCenterFrameInches = (boundingCenterX - frameCenterX) * (39.25/w)
                 elif (frameCenterX > boundingCenterX):
                     distanceFromCenterFrameInches = (frameCenterX - boundingCenterX) * (39.25/w)
 
                 
-                
-                #print(distanceFromCenterFrameInches)
-
-                # distanceFromTarget = float((372*46.25)/h)
-                #distanceFromTarget = float((434*41)/h)
                 distanceFromTarget = float((122*150)/h)
                 haveDistance = True
-
-               
-
-
+         
                 feet = distanceFromTarget/12
                 inches = distanceFromTarget%12
 
@@ -96,6 +90,16 @@ def extra_processing(cap, pipeline3, frame):
 
                 angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
                 angleDeg = degrees(angleRad)
+
+                """
+                When frameCenterX < boundingCenterX, the target is to the right of us.
+                When frameCenterX > boundingCenterX, the target is to the left of us.
+                We out put the angle as a negative when it is to the left of us.
+                """ 
+                if (frameCenterX < boundingCenterX):
+                   angleDeg = degrees(angleRad)
+                elif (frameCenterX > boundingCenterX):
+                    angleDeg = degrees(angleRad)*(-1)
 
                 print("Angle: {}".format(angleDeg))
 
