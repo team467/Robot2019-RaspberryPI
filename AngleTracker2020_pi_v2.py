@@ -69,6 +69,11 @@ def extra_processing(cap, pipeline3, frame):
 
                 # Initializing zero which is dead on
                 distanceFromCenterFrameInches = 0
+
+                """
+                When frameCenterX < boundingCenterX, the target is to the right of us.
+                When frameCenterX > boundingCenterX, the target is to the left of us.
+                """                 
                 if (frameCenterX < boundingCenterX):
                    distanceFromCenterFrameInches = (boundingCenterX - frameCenterX) * (39.25/w)
                 elif (frameCenterX > boundingCenterX):
@@ -96,6 +101,20 @@ def extra_processing(cap, pipeline3, frame):
 
                 angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
                 angleDeg = degrees(angleRad)
+
+
+
+                # Take a look at this if it makes sense. 
+                # It just makes the angle negative or positive 
+                # We out put the angle as a negative when it is to the left of us.
+
+                """
+                if (frameCenterX < boundingCenterX):
+                   angleDeg = degrees(angleRad)
+                elif (frameCenterX > boundingCenterX):
+                    angleDeg = degrees(angleRad)*(-1)
+                """
+
                 haveAngle = True
 
                 print("Angle: {}".format(angleDeg))
