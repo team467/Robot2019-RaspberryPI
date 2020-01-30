@@ -127,8 +127,8 @@ def change_res(cap, width, height):
 def main():
     # pipeline2 = TapeRecCodeTwo()
     pipeline3 = TapeRecCodeThree()
-    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-    # cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    cap = cv2.VideoCapture(0)
     change_res(cap, 1080, 720)
     frame_count = 0
     while True:
@@ -143,7 +143,7 @@ def main():
             pipeline3.process(frame)
             extra_processing(cap, pipeline3, frame)
 
-            cv2.imwrite("/home/pi/Vision2020/frames/frame.jpg", frame)
+            cv2.imwrite("C:\\Users\\theak\\Documents\\Akash\\Robotics\\Robot_Programs\\Competition\\Robot2019-RaspberryPI\\frame2.jpg", frame)
             # cv2.imshow("frame", frame)
             frame_count += 1
 
