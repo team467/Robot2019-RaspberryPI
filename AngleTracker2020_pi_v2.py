@@ -42,7 +42,8 @@ def extra_processing(cap, pipeline3, frame):
 
         # cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
 
-        center_x_positions.append(x + w / 2)  # X and Y are coordinates of the top-left corner of the bounding box
+        # X and Y are coordinates of the top-left corner of the bounding box
+        center_x_positions.append(x + w / 2)  
         center_y_positions.append(y + h / 2)
         
         topLeftX.append(x)
@@ -57,8 +58,8 @@ def extra_processing(cap, pipeline3, frame):
                 # cv2.imshow("frame", frame) 
                 print("h = {}, w = {}, x = {}, y = {}, a = {}".format(h, w, x, y, (w*h)))
 
-                #boundingCenterX = ((x+x+w)/2)
-                #William made some changes here with the bounding center calcs
+                # boundingCenterX = ((x+x+w)/2)
+                # William made some changes here with the bounding center calcs
                 # if (x > w):
                 #     boundingCenterX = (x + w/2)
                 # elif (x < w):
@@ -69,6 +70,11 @@ def extra_processing(cap, pipeline3, frame):
 
                 # Initializing zero which is dead on
                 distanceFromCenterFrameInches = 0
+
+                """
+                When frameCenterX < boundingCenterX, the target is to the right of us.
+                When frameCenterX > boundingCenterX, the target is to the left of us.
+                """                 
                 if (frameCenterX < boundingCenterX):
                    distanceFromCenterFrameInches = (boundingCenterX - frameCenterX) * (39.25/w)
                 elif (frameCenterX > boundingCenterX):
@@ -79,8 +85,8 @@ def extra_processing(cap, pipeline3, frame):
                 #print(distanceFromCenterFrameInches)
 
                 # distanceFromTarget = float((372*46.25)/h) 
-                #distanceFromTarget = float((434*41)/h)
-                # distanceFromTarget = float(((-50)/151)*h + 186.06623)
+                # distanceFromTarget = float((434*41)/h)
+                # distanceFromTarget = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
                 distanceFromTarget = float((122*150)/h)
                 haveDistance = True
 
@@ -95,7 +101,21 @@ def extra_processing(cap, pipeline3, frame):
                 print("Distance in inches: {}, Distance in feet and inches: {} feet, {} inches".format(int(distanceFromTarget), int(feet), int(inches)))
 
                 angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
-                angleDeg = degrees(angleRad)
+                # angleDeg = degrees(angleRad)
+
+
+
+                # Take a look at this if it makes sense. 
+                # It just makes the angle negative or positive 
+                # We out put the angle as a negative when it is to the left of us.
+
+            
+                if (frameCenterX < boundingCenterX):
+                   angleDeg = degrees(angleRad)
+                elif (frameCenterX > boundingCenterX):
+                    angleDeg = degrees(angleRad)*(-1)
+                
+
                 haveAngle = True
 
                 print("Angle: {}".format(angleDeg))
