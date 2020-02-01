@@ -82,12 +82,16 @@ def extra_processing(cap, pipeline3, frame):
 
                 
                 
-                #print(distanceFromCenterFrameInches)
+                # print(distanceFromCenterFrameInches)
 
                 # distanceFromTarget = float((372*46.25)/h) 
                 # distanceFromTarget = float((434*41)/h)
                 # distanceFromTarget = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
-                distanceFromTarget = float((122*150)/h)
+                
+                # I think this ratio might be better and find a better ratio
+                distanceFromTarget = float ((4800*(17/12))/h)
+
+                # distanceFromTarget = float((122*150)/h)
                 haveDistance = True
 
                 # we need to find a better ratio using more accurate tests
