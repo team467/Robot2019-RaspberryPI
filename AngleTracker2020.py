@@ -3,6 +3,7 @@
 import cv2
 #from networktables import NetworkTables
 # from grip_two import TapeRecCodeTwo
+# from grip_three_convexhull_trials import TapeRecCodeThreeTrials
 from grip_three_convexhull import TapeRecCodeThree
 #from grip import WideAngleGrip
 from math import *
@@ -112,10 +113,9 @@ def change_res(cap, width, height):
 
 
 def main():
-    # pipeline2 = TapeRecCodeTwo()
     pipeline3 = TapeRecCodeThree()
     cap = cv2.VideoCapture(0)
-    change_res(cap, 1080, 720)
+    change_res(cap, 1280, 720)
     frame_count = 0
     while True:
         have_frame, frame = cap.read()
@@ -125,6 +125,7 @@ def main():
             # cv2.imshow("frame", frame)
             frame_count += 1
 
+            cv2.imwrite("C:\\Users\\theak\\Documents\\Akash\\Robotics\\Robot_Programs\\Competition\\Robot2019-RaspberryPI\\frame2.jpg", frame)
             print("frame")
 
             # hit q to exit

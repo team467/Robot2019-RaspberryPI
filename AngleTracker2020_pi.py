@@ -172,10 +172,10 @@ def main():
             # extra_processing(cap, pipeline3, frame)
             # table.putBoolean("have_angle", have_angle)
             # if have_angle:
-                # table.putNumber("angle", angle)
+            #     table.putNumber("angle", angle)
             # table.putBoolean("have_distance", have_distance)
             # if have_distance:
-                # table.putNumber("distance", distance)
+            #     table.putNumber("distance", distance)
 
             # cv2.imshow("frame", frame)
             frame_count += 1
