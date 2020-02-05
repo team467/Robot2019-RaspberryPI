@@ -1,7 +1,7 @@
 # This version of AngleTracker2020 is supposed to be used on the raspberry pi
 
 import cv2
-# from networktables import NetworkTables
+from networktables import NetworkTables
 import threading
 # from grip_three_convexhull import TapeRecCodeThree
 from reduced_pipeline_with_convex_hull import RetroReflectiveTapeDetector
@@ -52,7 +52,8 @@ def extra_processing(pipeline3, frame):
         heights.append(h)
 
         # if float(w/h) >= 2.0001:
-        if float(w/h) <= 2.3:
+        bounding_rect_aspect_ratio = w/h
+        if bounding_rect_aspect_ratio >= 2.0 and bounding_rect_aspect_ratio < 2.5:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
             # cv2.imshow("frame",frame)
@@ -93,7 +94,12 @@ def extra_processing(pipeline3, frame):
             # # distanceFromTarget = float((122*150)/h)
             # haveDistance = True
 
-            distanceFromTarget = float((122*150)/h)
+            # distanceFromTarget = float((122*150)/h)
+
+            # distanceFromTarget = (0.009744376*(h**2))-(3.97097549*h)+507.5596921
+            # distanceFromTarget = (-6.49845*(10**-5)*(h**3)) + (0.036119406*(h**2)) - (7.287457586*h) + 635.8347037
+            distanceFromTarget = 20170/h
+
             haveDistance = True
 
             # we need to find a better ratio using more accurate tests
@@ -113,21 +119,21 @@ def extra_processing(pipeline3, frame):
 
 
             # calculating turning angle in degrees
-            if (frameCenterX > boundingCenterX):
+            if (frameCenterX < boundingCenterX):
                 angleDeg = degrees(angleRad) # if center of bounding box is to the right of the center of the frame, negative angle
-            elif (frameCenterX < boundingCenterX):
+            elif (frameCenterX > boundingCenterX):
                 angleDeg = degrees(angleRad)*(-1) # if center of bounding box is to the left of the center of the frame, positive angle
             
 
             haveAngle = True
 
             print("Angle: {}".format(angleDeg))
-        # else:
-        #     haveAngle = False
-        #     haveDistance = False
+        elif (distanceFromTarget == 0) or (angleDeg == 0):
+            haveAngle = False
+            haveDistance = False
         
         
-        return haveAngle, haveDistance, angleDeg, distanceFromTarget, frame
+    return haveAngle, haveDistance, angleDeg, distanceFromTarget
 
 
 
@@ -143,24 +149,24 @@ def main():
     distanceFromTarget = 0
     turningAngle = 0
 
-    # cond = threading.Condition()
-    # notified = [False]
+    cond = threading.Condition()
+    notified = [False]
 
-    # def connectionListener(connected, info):
-    #     with cond:
-    #         notified[0] = True
-    #         cond.notify()
+    def connectionListener(connected, info):
+        with cond:
+            notified[0] = True
+            cond.notify()
 
 
     # Initializing and connecting to network tables
-    # NetworkTables.initialize(server='10.4.67.23')
-    # NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+    NetworkTables.initialize(server='10.4.67.2')
+    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
-    # with cond:
-    #     if not notified[0]:
-    #         cond.wait()
+    with cond:
+        if not notified[0]:
+            cond.wait()
 
-    # table = NetworkTables.getTable('vision')
+    table = NetworkTables.getTable('vision')
    
     # pipeline3 = TapeRecCodeThree()
     pipeline3 = RetroReflectiveTapeDetector()
@@ -178,11 +184,20 @@ def main():
             print(frame_height)
 
             pipeline3.process(frame)
-            haveAngle, haveDistance, turningAngle, distanceFromTarget, frame = extra_processing(pipeline3, frame)
+            haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
 
-            # table.putBoolean("haveAngle", haveAngle)
-            # table.putBoolean("haveDistance", haveDistance)
-            # print("put to tables")
+            print("\n")
+
+            print("before putting to tables")
+            table.putBoolean("haveAngle", haveAngle)
+            print("haveAngle: {}".format(haveAngle))
+            table.putBoolean("haveDistance", haveDistance)
+            print("haveDistance: {}".format(haveDistance))
+            table.putNumber("TurningAngle", turningAngle)
+            print("turningAngle: {}".format(turningAngle))
+            table.putNumber("DistanceFromTarget", distanceFromTarget)
+            print("distanceFromTarget: {}".format(distanceFromTarget))
+            print("put all to tables")
 
             # if haveAngle:
             #     table.putNumber("TurningAngle", turningAngle)
@@ -194,8 +209,8 @@ def main():
             #     table.putNumber("DistanceFromTarget", 0)
 
             # cv2.imwrite("/home/pi/Vision2020/frames/frame.jpg", frame)
-            cv2.imwrite("C:\\Users\\theak\\Documents\\Akash\\Robotics\\Robot_Programs\\Competition\\Robot2019-RaspberryPI\\local_frame.png", frame)
-            # cv2.imwrite("pi_frame.png", frame)
+            # cv2.imwrite("C:\\Users\\theak\\Documents\\Akash\\Robotics\\Robot_Programs\\Competition\\Robot2019-RaspberryPI\\local_frame.png", frame)
+            # cv2.imwrite("pi_frame.jpg", frame)
             # cv2.imshow("frame", frame)
             frame_count += 1
 
@@ -204,8 +219,8 @@ def main():
             # hit q to exit
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-            elif frame_count == 50:
-                break
+            # elif frame_count == 50:
+            #     break
 
 
 if __name__ == "__main__":
