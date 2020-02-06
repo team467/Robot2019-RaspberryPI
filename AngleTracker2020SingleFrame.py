@@ -72,11 +72,22 @@ def extra_processing(pipeline3, frame):
 
                 
                 
-                #print(distanceFromCenterFrameInches)
+                # # print(distanceFromCenterFrameInches)
 
-                # distanceFromTarget = float((372*46.25)/h) 
-                #distanceFromTarget = float((434*41)/h)
-                # distanceFromTarget = float(((-50)/151)*h + 186.06623)
+            # # distanceFromTarget = float((372*46.25)/h) 
+            # # distanceFromTarget = float((434*41)/h)
+            # # distanceFromTarget = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
+            
+            # # I think this ratio might be better and find a better ratio
+            # distanceFromTarget = float ((7200*(17/12))/h)
+
+            # # distanceFromTarget = float((122*150)/h)
+            # haveDistance = True
+
+            # distanceFromTarget = float((122*150)/h)
+
+            # distanceFromTarget = (0.009744376*(h**2))-(3.97097549*h)+507.5596921
+            # distanceFromTarget = (-6.49845*(10**-5)*(h**3)) + (0.036119406*(h**2)) - (7.287457586*h) + 635.8347037
                 distanceFromTarget = float((122*150)/h)
 
                 # we need to find a better ratio using more accurate tests

@@ -35,11 +35,10 @@ def extra_processing(pipeline3, frame):
     angleDeg = 0
     distanceFromTarget = 0
  
-    # Find the bounding boxes of the contours to get x, y, width, and height
-    
-
+    # Find the bounding boxes of the contours to get x, y, width, and height and calculate distance and angle
     for contour in pipeline3.filter_contours_output:
 
+        # get x, y, width, and height of contour by finding bounding rect using opencv
         x, y, w, h = cv2.boundingRect(contour)
 
         # X and Y are coordinates of the top-left corner of the bounding box
@@ -51,7 +50,7 @@ def extra_processing(pipeline3, frame):
         widths.append(w)
         heights.append(h)
 
-        # if float(w/h) >= 2.0001:
+        # only draw bounding box and do calculations if ratio of w to h of box is between 2.0 and 2.5 inclusive
         bounding_rect_aspect_ratio = w/h
         if bounding_rect_aspect_ratio >= 2.0 and bounding_rect_aspect_ratio < 2.5:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
@@ -66,7 +65,7 @@ def extra_processing(pipeline3, frame):
 
             frameCenterX = 540
 
-            # Initializing zero which is dead on
+            # Initializing variable for the distance between the center of the frame and center of bounding box in inches, used to calculate angle
             distanceFromCenterFrameInches = 0
 
             """
@@ -80,29 +79,10 @@ def extra_processing(pipeline3, frame):
             elif (frameCenterX > boundingCenterX):
                 distanceFromCenterFrameInches = (frameCenterX - boundingCenterX) * (39.25/w)
 
-                
-                
-            # # print(distanceFromCenterFrameInches)
-
-            # # distanceFromTarget = float((372*46.25)/h) 
-            # # distanceFromTarget = float((434*41)/h)
-            # # distanceFromTarget = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
-            
-            # # I think this ratio might be better and find a better ratio
-            # distanceFromTarget = float ((7200*(17/12))/h)
-
-            # # distanceFromTarget = float((122*150)/h)
-            # haveDistance = True
-
-            # distanceFromTarget = float((122*150)/h)
-
-            # distanceFromTarget = (0.009744376*(h**2))-(3.97097549*h)+507.5596921
-            # distanceFromTarget = (-6.49845*(10**-5)*(h**3)) + (0.036119406*(h**2)) - (7.287457586*h) + 635.8347037
+            # calculate distance of camera from target in inches
             distanceFromTarget = 20170/h
 
             haveDistance = True
-
-            # we need to find a better ratio using more accurate tests
 
             # convert distance from target from inches to ft and inches
             feet = distanceFromTarget/12
@@ -128,7 +108,7 @@ def extra_processing(pipeline3, frame):
             haveAngle = True
 
             print("Angle: {}".format(angleDeg))
-        elif (distanceFromTarget == 0) or (angleDeg == 0):
+        elif (distanceFromTarget == 0) or (angleDeg == 0): # if distance or angle is 0, program does not have an angle or distance
             haveAngle = False
             haveDistance = False
         
@@ -162,32 +142,32 @@ def main():
     NetworkTables.initialize(server='10.4.67.2')
     NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
+    # wait till network tables are found
     with cond:
         if not notified[0]:
             cond.wait()
 
     table = NetworkTables.getTable('vision')
    
-    # pipeline3 = TapeRecCodeThree()
     pipeline3 = RetroReflectiveTapeDetector()
-    # cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
     cap = cv2.VideoCapture(0)
+
+    # set resolution of video feed to 1280x720
     change_res(cap, 1280, 720)
+
     frame_count = 0
+
     while True:
         have_frame, frame = cap.read()
         if have_frame:
 
-            frame_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-            frame_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            print(frame_width)
-            print(frame_height)
-
+            # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             pipeline3.process(frame)
             haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
 
             print("\n")
 
+            # put values to network tables
             print("before putting to tables")
             table.putBoolean("haveAngle", haveAngle)
             print("haveAngle: {}".format(haveAngle))
@@ -199,19 +179,6 @@ def main():
             print("distanceFromTarget: {}".format(distanceFromTarget))
             print("put all to tables")
 
-            # if haveAngle:
-            #     table.putNumber("TurningAngle", turningAngle)
-            # else:
-            #     table.putNumber("TurningAngle", 0)
-            # if haveDistance:
-            #     table.putNumber("DistanceFromTarget", distanceFromTarget)
-            # else:
-            #     table.putNumber("DistanceFromTarget", 0)
-
-            # cv2.imwrite("/home/pi/Vision2020/frames/frame.jpg", frame)
-            # cv2.imwrite("C:\\Users\\theak\\Documents\\Akash\\Robotics\\Robot_Programs\\Competition\\Robot2019-RaspberryPI\\local_frame.png", frame)
-            # cv2.imwrite("pi_frame.jpg", frame)
-            # cv2.imshow("frame", frame)
             frame_count += 1
 
             print("Frame count: {}".format(frame_count))
@@ -219,8 +186,6 @@ def main():
             # hit q to exit
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-            # elif frame_count == 50:
-            #     break
 
 
 if __name__ == "__main__":
