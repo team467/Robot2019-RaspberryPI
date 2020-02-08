@@ -1,0 +1,17 @@
+[Unit]
+
+Description=AngleTracker
+
+After=multi-user.target
+
+[Service]
+
+Type=simple
+
+ExecStart=/home/pi/Vision2020/LDPreloadVision2020.sh
+
+Restart=always
+
+[Install]
+
+WantedBy=multi-user.target
