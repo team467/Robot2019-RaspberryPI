@@ -1,8 +1,6 @@
 # This version of AngleTracker2020 is supposed to be used on the raspberry pi
 
 import cv2
-from networktables import NetworkTables
-import threading
 from reduced_pipeline_with_convex_hull import RetroReflectiveTapeDetector
 from math import *
 import sys
@@ -45,7 +43,8 @@ def extra_processing(pipeline3, frame):
         center_y_positions.append(y + h / 2)
         
         topLeftX.append(x)
-        topLeftY.append(y)
+        topLeftY.append(y) 
+        
         widths.append(w)
         heights.append(h)
 
@@ -54,6 +53,10 @@ def extra_processing(pipeline3, frame):
         if bounding_rect_aspect_ratio >= 2.0 and bounding_rect_aspect_ratio < 2.5:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
+            # cv2.imshow("frame",frame)
+            
+            # print height, width, x, and y positions of bounding box
+            print("h = {}, w = {}, x = {}, y = {}, a = {}".format(h, w, x, y, (w*h))) # x and y represent the top left of the box
 
             # find center point of bounding box
             boundingCenterX = (x + (w/2))
@@ -83,8 +86,15 @@ def extra_processing(pipeline3, frame):
             feet = distanceFromTarget/12
             inches = distanceFromTarget%12
 
+            print("Distance from frame center to box center: {}, Bounding box center: {}, Frame center: {}".format((boundingCenterX-frameCenterX), boundingCenterX, frameCenterX))
+
+            print("Distance in inches: {}, Distance in feet and inches: {} feet, {} inches".format(int(distanceFromTarget), int(feet), int(inches)))
+
+
             # finding turning angle in radians
             angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
+
+
 
             # calculating turning angle in degrees
             if (frameCenterX < boundingCenterX):
@@ -95,6 +105,7 @@ def extra_processing(pipeline3, frame):
 
             haveAngle = True
 
+            print("Angle: {}".format(angleDeg))
         elif (distanceFromTarget == 0) or (angleDeg == 0): # if distance or angle is 0, program does not have an angle or distance
             haveAngle = False
             haveDistance = False
@@ -115,26 +126,6 @@ def main():
     haveDistance = False
     distanceFromTarget = 0
     turningAngle = 0
-
-    cond = threading.Condition()
-    notified = [False]
-
-    def connectionListener(connected, info):
-        with cond:
-            notified[0] = True
-            cond.notify()
-
-
-    # Initializing and connecting to network tables
-    NetworkTables.initialize(server='10.4.67.2')
-    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
-
-    # wait till network tables are found
-    with cond:
-        if not notified[0]:
-            cond.wait()
-
-    table = NetworkTables.getTable('vision')
    
     pipeline3 = RetroReflectiveTapeDetector()
     cap = cv2.VideoCapture(0)
@@ -152,11 +143,9 @@ def main():
             pipeline3.process(frame)
             haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
 
-            # put values to network tables
-            table.putBoolean("haveAngle", haveAngle)
-            table.putBoolean("haveDistance", haveDistance)
-            table.putNumber("TurningAngle", turningAngle)
-            table.putNumber("DistanceFromTarget", distanceFromTarget)
+            # print("\n")
+
+            print("Frame count: {}".format(frame_count))
 
             frame_count += 1
 
