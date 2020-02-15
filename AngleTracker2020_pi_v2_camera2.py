@@ -33,7 +33,7 @@ def extra_processing(pipeline3, frame):
     haveAngle = False
     haveDistance = False
     angleDeg = 0
-    distanceFromTarget = 0
+    distanceFromTarget2 = 0
  
     # Find the bounding boxes of the contours to get x, y, width, and height
     
@@ -83,32 +83,26 @@ def extra_processing(pipeline3, frame):
                 
             # # print(distanceFromCenterFrameInches)
 
-            # # distanceFromTarget = float((372*46.25)/h) 
-            # # distanceFromTarget = float((434*41)/h)
-            # # distanceFromTarget = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
-            
-            # # I think this ratio might be better and find a better ratio
-            # distanceFromTarget = float ((7200*(17/12))/h)
+            # # distanceFromTarget2 = float((372*46.25)/h) 
+            # # distanceFromTarget2 = float((434*41)/h)
+            # # distanceFromTarget2 = float(((-50)/151)*h + 186.06623) (This is a function we came up with)
 
-            # # distanceFromTarget = float((122*150)/h)
-            # haveDistance = True
-
-            distanceFromTarget = float((122*150)/h)
+            distanceFromTarget2 = float((122*150)/h)
             haveDistance = True
 
             # we need to find a better ratio using more accurate tests
 
             # convert distance from target from inches to ft and inches
-            feet = distanceFromTarget/12
-            inches = distanceFromTarget%12
+            feet = distanceFromTarget2/12
+            inches = distanceFromTarget2%12
 
             print("Distance from frame center to box center: {}, Bounding box center: {}, Frame center: {}".format((boundingCenterX-frameCenterX), boundingCenterX, frameCenterX))
 
-            print("Distance in inches: {}, Distance in feet and inches: {} feet, {} inches".format(int(distanceFromTarget), int(feet), int(inches)))
+            print("Distance in inches: {}, Distance in feet and inches: {} feet, {} inches".format(int(distanceFromTarget2), int(feet), int(inches)))
 
 
             # finding turning angle in radians
-            angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
+            angleRad2 = atan(distanceFromCenterFrameInches/distanceFromTarget2)
 
 
 
@@ -127,7 +121,7 @@ def extra_processing(pipeline3, frame):
         #     haveDistance = False
         
         
-        return haveAngle, haveDistance, angleDeg, distanceFromTarget, frame
+        return haveAngle, haveDistance, angleDeg, distanceFromTarget2, frame
 
 
 
@@ -140,7 +134,7 @@ def main():
 
     haveAngle = False
     haveDistance = False
-    distanceFromTarget = 0
+    distanceFromTarget2 = 0
     turningAngle = 0
 
     # cond = threading.Condition()
@@ -178,7 +172,7 @@ def main():
             print(frame_height)
 
             pipeline3.process(frame)
-            haveAngle, haveDistance, turningAngle, distanceFromTarget, frame = extra_processing(pipeline3, frame)
+            haveAngle, haveDistance, turningAngle, distanceFromTarget2, frame = extra_processing(pipeline3, frame)
 
             # table.putBoolean("haveAngle", haveAngle)
             # table.putBoolean("haveDistance", haveDistance)
@@ -189,9 +183,9 @@ def main():
             # else:
             #     table.putNumber("TurningAngle", 0)
             # if haveDistance:
-            #     table.putNumber("DistanceFromTarget", distanceFromTarget)
+            #     table.putNumber("distanceFromTarget2", distanceFromTarget2)
             # else:
-            #     table.putNumber("DistanceFromTarget", 0)
+            #     table.putNumber("distanceFromTarget2", 0)
 
             # cv2.imwrite("/home/pi/Vision2020/frames/frame.jpg", frame)
             cv2.imwrite("C:\\Users\\theak\\Documents\\Akash\\Robotics\\Robot_Programs\\Competition\\Robot2019-RaspberryPI\\local_frame.png", frame)

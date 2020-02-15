@@ -8,7 +8,9 @@ from math import *
 import sys
 from numpy import *
 
-def extra_processing(pipeline3, frame):
+
+
+def extra_processings(pipeline3, frame):
     """
     Performs extra processing on the pipeline's outputs and publishes data to NetworkTables.
     :param pipeline: the pipeline that just processed an image
@@ -32,7 +34,7 @@ def extra_processing(pipeline3, frame):
     haveAngle = False
     haveDistance = False
     angleDeg = 0
-    distanceFromTarget = 0
+    distanceFromTarget1 = 0
  
     # Find the bounding boxes of the contours to get x, y, width, and height and calculate distance and angle
     for contour in pipeline3.filter_contours_output:
@@ -75,32 +77,32 @@ def extra_processing(pipeline3, frame):
                 distanceFromCenterFrameInches = (frameCenterX - boundingCenterX) * (39.25/w)
 
             # calculate distance of camera from target in inches
-            distanceFromTarget = 20170/h
+            distanceFromTarget1 = 20170/h
 
             haveDistance = True
 
             # convert distance from target from inches to ft and inches
-            feet = distanceFromTarget/12
-            inches = distanceFromTarget%12
+            feet = distanceFromTarget1/12
+            inches = distanceFromTarget1%12
 
             # finding turning angle in radians
-            angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
+            angleRad1 = atan(distanceFromCenterFrameInches/distanceFromTarget1)
 
             # calculating turning angle in degrees
             if (frameCenterX < boundingCenterX):
-                angleDeg = degrees(angleRad) # if center of bounding box is to the right of the center of the frame, negative angle
+                angleDeg1 = degrees(angleRad) # if center of bounding box is to the right of the center of the frame, negative angle
             elif (frameCenterX > boundingCenterX):
-                angleDeg = degrees(angleRad)*(-1) # if center of bounding box is to the left of the center of the frame, positive angle
+                angleDeg1 = degrees(angleRad)*(-1) # if center of bounding box is to the left of the center of the frame, positive angle
             
 
             haveAngle = True
 
-        elif (distanceFromTarget == 0) or (angleDeg == 0): # if distance or angle is 0, program does not have an angle or distance
+        elif (distanceFromTarget1 == 0) or (angleDeg == 0): # if distance or angle is 0, program does not have an angle or distance
             haveAngle = False
             haveDistance = False
         
         
-    return haveAngle, haveDistance, angleDeg, distanceFromTarget
+    return haveAngle, haveDistance, angleDeg, distanceFromTarget1
 
 
 
@@ -113,7 +115,7 @@ def main():
 
     haveAngle = False
     haveDistance = False
-    distanceFromTarget = 0
+    distanceFromTarget1 = 0
     turningAngle = 0
 
     cond = threading.Condition()
@@ -150,13 +152,15 @@ def main():
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             pipeline3.process(frame)
-            haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
+            haveAngle, haveDistance, turningAngle, distanceFromTarget1 = extra_processing(pipeline3, frame)
 
             # put values to network tables
             table.putBoolean("haveAngle", haveAngle)
             table.putBoolean("haveDistance", haveDistance)
             table.putNumber("TurningAngle", turningAngle)
-            table.putNumber("DistanceFromTarget", distanceFromTarget)
+            table.putNumber("distanceFromTarget1", distanceFromTarget1)
+
+
 
             frame_count += 1
 

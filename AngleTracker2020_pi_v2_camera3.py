@@ -30,8 +30,8 @@ def extra_processing(pipeline3, frame):
     lw = 0
     lh = 0
 
-    haveAngle = False
-    haveDistance = False
+    haveAngle3 = False
+    haveDistance3 = False
     angleDeg = 0
     distanceFromTarget3 = 0
  
@@ -91,10 +91,10 @@ def extra_processing(pipeline3, frame):
             # distanceFromTarget3 = float ((7200*(17/12))/h)
 
             # # distanceFromTarget3 = float((122*150)/h)
-            # haveDistance = True
+            # haveDistance3 = True
 
             distanceFromTarget3 = float((122*150)/h)
-            haveDistance = True
+            haveDistance3 = True
 
             # we need to find a better ratio using more accurate tests
 
@@ -119,15 +119,15 @@ def extra_processing(pipeline3, frame):
                 angleDeg = degrees(angleRad)*(-1) # if center of bounding box is to the left of the center of the frame, positive angle
             
 
-            haveAngle = True
+            haveAngle3 = True
 
             print("Angle: {}".format(angleDeg))
         # else:
-        #     haveAngle = False
-        #     haveDistance = False
+        #     haveAngle3 = False
+        #     haveDistance3 = False
         
         
-        return haveAngle, haveDistance, angleDeg, distanceFromTarget3, frame
+        return haveAngle3, haveDistance3, angleDeg, distanceFromTarget3, frame
 
 
 
@@ -138,10 +138,10 @@ def change_res(cap, width, height):
 
 def main():
 
-    haveAngle = False
-    haveDistance = False
+    haveAngle3 = False
+    haveDistance3 = False
     distanceFromTarget3 = 0
-    turningAngle = 0
+    turningAngle3 = 0
 
     # cond = threading.Condition()
     # notified = [False]
@@ -178,17 +178,17 @@ def main():
             print(frame_height)
 
             pipeline3.process(frame)
-            haveAngle, haveDistance, turningAngle, distanceFromTarget3, frame = extra_processing(pipeline3, frame)
+            haveAngle3, haveDistance3, turningAngle3, distanceFromTarget3, frame = extra_processing(pipeline3, frame)
 
-            # table.putBoolean("haveAngle", haveAngle)
-            # table.putBoolean("haveDistance", haveDistance)
+            # table.putBoolean("haveAngle3", haveAngle3)
+            # table.putBoolean("haveDistance3", haveDistance3)
             # print("put to tables")
 
-            # if haveAngle:
-            #     table.putNumber("TurningAngle", turningAngle)
+            # if haveAngle3:
+            #     table.putNumber("turningAngle3", turningAngle3)
             # else:
-            #     table.putNumber("TurningAngle", 0)
-            # if haveDistance:
+            #     table.putNumber("turningAngle3", 0)
+            # if haveDistance3:
             #     table.putNumber("distanceFromTarget3", distanceFromTarget3)
             # else:
             #     table.putNumber("distanceFromTarget3", 0)
