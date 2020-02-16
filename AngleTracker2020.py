@@ -4,7 +4,7 @@ import cv2
 #from networktables import NetworkTables
 # from grip_two import TapeRecCodeTwo
 # from grip_three_convexhull_trials import TapeRecCodeThreeTrials
-from grip_three_convexhull import TapeRecCodeThree
+from reduced_pipeline_with_convex_hull import RetroReflectiveTapeDetector 
 #from grip import WideAngleGrip
 from math import *
 
@@ -47,7 +47,7 @@ def extra_processing(cap, pipeline3, frame):
         heights.append(h)
 
         if float(w/h) >= 2.0:
-            if float(w/h) <= 2.3:
+            if float(w/h) <= 2.5:
                 cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
                 cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
                 cv2.imshow("frame", frame) 
@@ -113,7 +113,7 @@ def change_res(cap, width, height):
 
 
 def main():
-    pipeline3 = TapeRecCodeThree()
+    pipeline3 = RetroReflectiveTapeDetector()
     cap = cv2.VideoCapture(0)
     change_res(cap, 1280, 720)
     frame_count = 0

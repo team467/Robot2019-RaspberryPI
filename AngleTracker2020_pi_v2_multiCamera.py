@@ -156,6 +156,7 @@ def main():
    
     pipeline3 = RetroReflectiveTapeDetector()
     cap = cv2.VideoCapture(0)
+    cap2 = cv2.VideoCapture(2)
 
     # set resolution of video feed to 1280x720
     change_res(cap, 1280, 720)
@@ -164,17 +165,38 @@ def main():
 
     while True:
         have_frame, frame = cap.read()
+        have_frame2, frame2 = cap2.read()
         if have_frame:
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             pipeline3.process(frame)
+            pipeline3.process(frame2)
             haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
+            haveAngle2, haveDistance2, turningAngle2, distanceFromTarget2 = extra_processing(pipeline3, frame2)
 
             # put values to network tables
+            
             table.putBoolean("haveAngle", haveAngle)
             table.putBoolean("haveDistance", haveDistance)
-            table.putNumber("TurningAngle", turningAngle)
-            table.putNumber("DistanceFromTarget", distanceFromTarget)
+
+            table.putBoolean("haveAngle2", haveAngle2)
+            table.putBoolean("haveDistance2", haveDistance2)
+
+            if haveDistance and haveDistance2:
+                distanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
+                table.putNumber("DistanceFromTarget", distanceFromTarget)
+            elif haveDistance:
+                table.putNumber("DistanceFromTarget", distanceFromTarget)
+            elif haveDistance2:
+                table.putNumber("DistanceFromTarget", distanceFromTarget2)
+
+            if haveAngle and haveAngle2:
+                turningAngle = (turningAngle + turningAngle2)/2
+                table.putNumber("TurningAngle", turningAngle)
+            elif haveAngle:
+                table.putNumber("TurningAngle", turningAngle)
+            elif haveAngle2:
+                table.putNumber("TurningAngle", turningAngle2)
 
             frame_count += 1
 
