@@ -192,7 +192,7 @@ def main():
         have_frame, frame = cap.read()
         have_frame2, frame2 = cap2.read()
         # have_frame3, frame3, cap3.read()
-        if have_frame:
+        if (have_frame and have_frame2):
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             pipeline3.process(frame)
@@ -236,6 +236,8 @@ def main():
             #     table.putNumber("TurningAngle", turningAngle2)
                 print("TurningAngle: {}".format(turningAngle2))
 
+            cv2.imwrite("/home/pi/Vision2020/frames/frame1.jpg", frame)
+            cv2.imwrite("/home/pi/Vision2020/frames/frame2.jpg", frame2)
             
 
             frame_count += 1
