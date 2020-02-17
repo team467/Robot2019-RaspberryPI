@@ -57,7 +57,7 @@ def extra_processing(pipeline3, frame):
         if bounding_rect_aspect_ratio >= 1.7 and bounding_rect_aspect_ratio < 2.6:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
-            cv2.imshow("frame", frame)
+            # cv2.imshow("frame", frame)
 
             # print("height: {}, width: {}".format(h, w))
 
@@ -130,8 +130,8 @@ def extra_processing(pipeline3, frame):
             #     haveDistance = False
             #     haveAngle = False
 
-            if (haveAngle == True) and (haveDistance == True):
-                print("height: {}, width: {}, area: {}, distance: {}, x: {}, y: {}, angle: {}".format(h, w, (h*w), distanceFromTarget, x, y, angleDeg))
+            
+            # print("height: {}, width: {}, area: {}, distance: {}, x: {}, y: {}, angle: {}".format(h, w, (h*w), distanceFromTarget, x, y, angleDeg))
 
         elif (distanceFromTarget == 0) or (angleDeg == 0): # if distance or angle is 0, program does not have an angle or distance
             haveAngle = False
@@ -155,25 +155,25 @@ def main():
     distanceFromTarget = 0
     turningAngle = 0
 
-    cond = threading.Condition()
-    notified = [False]
+    # cond = threading.Condition()
+    # notified = [False]
 
-    def connectionListener(connected, info):
-        with cond:
-            notified[0] = True
-            cond.notify()
+    # def connectionListener(connected, info):
+    #     with cond:
+    #         notified[0] = True
+    #         cond.notify()
 
 
-    # Initializing and connecting to network tables
-    NetworkTables.initialize(server='10.4.67.2')
-    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+    # # Initializing and connecting to network tables
+    # NetworkTables.initialize(server='10.4.67.2')
+    # NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
-    # wait till network tables are found
-    with cond:
-        if not notified[0]:
-            cond.wait()
+    # # wait till network tables are found
+    # with cond:
+    #     if not notified[0]:
+    #         cond.wait()
 
-    table = NetworkTables.getTable('vision')
+    # table = NetworkTables.getTable('vision')
    
     pipeline3 = RetroReflectiveTapeDetector()
     
@@ -183,6 +183,7 @@ def main():
 
     # set resolution of video feed to 1280x720
     change_res(cap, 1280, 720)
+    change_res(cap2, 1280, 720)
 
     frame_count = 0
 
@@ -190,7 +191,7 @@ def main():
     while True:
         have_frame, frame = cap.read()
         have_frame2, frame2 = cap2.read()
-        have_frame3, frame3, cap3.read()
+        # have_frame3, frame3, cap3.read()
         if have_frame:
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
@@ -202,39 +203,40 @@ def main():
 
             # put values to network tables
             
-            # Camera 1
-            table.putBoolean("haveAngle", haveAngle)
-            table.putBoolean("haveDistance", haveDistance)
+            # # Camera 1
+            # table.putBoolean("haveAngle", haveAngle)
+            # table.putBoolean("haveDistance", haveDistance)
             
-            # Camera 2
-            table.putBoolean("haveAngle2", haveAngle2)
-            table.putBoolean("haveDistance2", haveDistance2)
+            # # Camera 2
+            # table.putBoolean("haveAngle2", haveAngle2)
+            # table.putBoolean("haveDistance2", haveDistance2)
 
+            print("haveDistance: {}, haveAngle: {}".format(haveDistance, haveAngle))
+            print("haveDistance2: {}, haveAngle2: {}".format(haveDistance2, haveAngle2))
 
             if haveDistance and haveDistance2:
-                FinaldistanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
-                table.putNumber("DistanceFromTarget Camera 1:" + distanceFromTarget) # Knowing which values correspond to which camera is useful for debugging
-                table.putNumber("DistanceFromTarget Camera 2:" + distanceFromTarget2)
-                table.putNumber("Average DistanceFromTarget:", FinaldistanceFromTarget)
+                finalDistanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
+            #     table.putNumber("DistanceFromTarget", finalDistanceFromTarget)
+                print("DistanceFromTarget: {}".format(finalDistanceFromTarget))
             elif haveDistance:
-                table.putNumber("DistanceFromTarget Camera 1:", distanceFromTarget)
-                table.putNumber("DistanceFromTarget Camera 2:", distanceFromTarget2)
+            #     table.putNumber("DistanceFromTarget", distanceFromTarget)
+                print("DistanceFromTarget: {}".format(distanceFromTarget))
             elif haveDistance2:
-                table.putNumber("DistanceFromTarget Camera 1:", distanceFromTarget)
-                table.putNumber("DistanceFromTarget Camera 2:", distanceFromTarget2)
+            #     table.putNumber("DistanceFromTarget", distanceFromTarget2)
+                print("DistanceFromTarget: {}".format(distanceFromTarget2))
 
             if haveAngle and haveAngle2:
-                FinalturningAngle = (turningAngle + turningAngle2)/2
-                table.putNumber("TurningAngle Camera 1:" + turningAngle)
-                table.putNumber("TurningAngle Camera 2:" + turningAngle2)
-                table.putNumber("Average TurningAngle:", FinalturningAngle)
+                finalTurningAngle = (turningAngle + turningAngle2)/2
+            #     table.putNumber("Average TurningAngle:", finalTurningAngle)
+                print("TurningAngle: {}".format(finalTurningAngle))
             elif haveAngle:
-                table.putNumber("TurningAngle Camera 1:" + turningAngle)
-                table.putNumber("TurningAngle Camera 2:" + turningAngle2)
+            #     table.putNumber("TurningAngle", turningAngle)
+                print("TurningAngle: {}".format(turningAngle))
+            elif haveAngle2:   
+            #     table.putNumber("TurningAngle", turningAngle2)
+                print("TurningAngle: {}".format(turningAngle2))
 
-            elif haveAngle2:        
-                table.putNumber("TurningAngle Camera 1:" + turningAngle)
-                table.putNumber("TurningAngle Camera 2:" + turningAngle2)
+            
 
             frame_count += 1
 
