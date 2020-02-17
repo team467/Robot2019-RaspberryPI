@@ -85,6 +85,8 @@ def extra_processing(pipeline3, frame):
             feet = distanceFromTarget/12
             inches = distanceFromTarget%12
 
+            haveDistance = True
+
             # finding turning angle in radians
             angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
 
@@ -97,8 +99,12 @@ def extra_processing(pipeline3, frame):
 
             haveAngle = True
 
-            # This is used to try and remove bounding boxes that aren't correct
-            # The miscellaneous boxes are usually are pretty off, and the driver should line us up pretty well
+            """
+            This is used to try and remove bounding boxes that aren't correct
+            The miscellaneous boxes are usually are pretty off, and the driver should line us up pretty well
+            Lol, this might not actually be a good idea because the two cameras will have different angles
+            """
+            """
             if (angleDeg > 30 or angleDeg < -30):
               haveAngle = False
               haveDistance = False
@@ -107,6 +113,7 @@ def extra_processing(pipeline3, frame):
             else:
                 haveAngle = True
                 haveDistance = True
+            """
 
             # if (distanceFromTarget <= 350) and (distanceFromTarget >= 100):
             #         cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
