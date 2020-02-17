@@ -1,4 +1,6 @@
 # This version of AngleTracker2020 is supposed to be used on the raspberry pi
+# This is probably the final version we will use
+# It is able to support both cameras
 
 import cv2
 from networktables import NetworkTables
@@ -51,6 +53,7 @@ def extra_processing(pipeline3, frame):
 
         # only draw bounding box and do calculations if ratio of w to h of box is between 2.0 and 2.5 inclusive
         bounding_rect_aspect_ratio = w/h
+        # If perfect, the bounding box ratio is around 2.31
         if bounding_rect_aspect_ratio >= 1.7 and bounding_rect_aspect_ratio < 2.6:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
@@ -80,11 +83,11 @@ def extra_processing(pipeline3, frame):
             # calculate distance of camera from target in inches
             distanceFromTarget = 20170/h
 
-            haveDistance = True
-
             # convert distance from target from inches to ft and inches
             feet = distanceFromTarget/12
             inches = distanceFromTarget%12
+
+            haveDistance = True
 
             # finding turning angle in radians
             angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
@@ -98,6 +101,23 @@ def extra_processing(pipeline3, frame):
 
             haveAngle = True
 
+            """
+            This is used to try and remove bounding boxes that aren't correct
+            The miscellaneous boxes are usually are pretty off, and the driver should line us up pretty well
+            Lol, this might not actually be a good idea because the two cameras will have different angles
+            """
+            """
+            if (angleDeg > 30 or angleDeg < -30):
+              haveAngle = False
+              haveDistance = False
+              print("the angle is greater than 30 degrees")
+            
+            else:
+                haveAngle = True
+                haveDistance = True
+            """
+
+            # A distance filter
             # if (distanceFromTarget <= 350) and (distanceFromTarget >= 100):
             #         cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             #         cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
@@ -110,7 +130,8 @@ def extra_processing(pipeline3, frame):
             #     haveDistance = False
             #     haveAngle = False
 
-            print("height: {}, width: {}, area: {}, distance: {}, x: {}, y: {}, angle: {}".format(h, w, (h*w), distanceFromTarget, x, y, angleDeg))
+            if (haveAngle == True) and (haveDistance == True):
+                print("height: {}, width: {}, area: {}, distance: {}, x: {}, y: {}, angle: {}".format(h, w, (h*w), distanceFromTarget, x, y, angleDeg))
 
         elif (distanceFromTarget == 0) or (angleDeg == 0): # if distance or angle is 0, program does not have an angle or distance
             haveAngle = False
@@ -155,6 +176,8 @@ def main():
     table = NetworkTables.getTable('vision')
    
     pipeline3 = RetroReflectiveTapeDetector()
+    
+    # Two cameras
     cap = cv2.VideoCapture(0)
     cap2 = cv2.VideoCapture(2)
 
@@ -163,40 +186,55 @@ def main():
 
     frame_count = 0
 
+    # Make sure to change values if we are using a third camera
     while True:
         have_frame, frame = cap.read()
         have_frame2, frame2 = cap2.read()
+        have_frame3, frame3, cap3.read()
         if have_frame:
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             pipeline3.process(frame)
             pipeline3.process(frame2)
+
             haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
             haveAngle2, haveDistance2, turningAngle2, distanceFromTarget2 = extra_processing(pipeline3, frame2)
 
             # put values to network tables
             
+            # Camera 1
             table.putBoolean("haveAngle", haveAngle)
             table.putBoolean("haveDistance", haveDistance)
-
+            
+            # Camera 2
             table.putBoolean("haveAngle2", haveAngle2)
             table.putBoolean("haveDistance2", haveDistance2)
 
+
             if haveDistance and haveDistance2:
-                distanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
-                table.putNumber("DistanceFromTarget", distanceFromTarget)
+                FinaldistanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
+                table.putNumber("DistanceFromTarget Camera 1:" + distanceFromTarget) # Knowing which values correspond to which camera is useful for debugging
+                table.putNumber("DistanceFromTarget Camera 2:" + distanceFromTarget2)
+                table.putNumber("Average DistanceFromTarget:", FinaldistanceFromTarget)
             elif haveDistance:
-                table.putNumber("DistanceFromTarget", distanceFromTarget)
+                table.putNumber("DistanceFromTarget Camera 1:", distanceFromTarget)
+                table.putNumber("DistanceFromTarget Camera 2:", distanceFromTarget2)
             elif haveDistance2:
-                table.putNumber("DistanceFromTarget", distanceFromTarget2)
+                table.putNumber("DistanceFromTarget Camera 1:", distanceFromTarget)
+                table.putNumber("DistanceFromTarget Camera 2:", distanceFromTarget2)
 
             if haveAngle and haveAngle2:
-                turningAngle = (turningAngle + turningAngle2)/2
-                table.putNumber("TurningAngle", turningAngle)
+                FinalturningAngle = (turningAngle + turningAngle2)/2
+                table.putNumber("TurningAngle Camera 1:" + turningAngle)
+                table.putNumber("TurningAngle Camera 2:" + turningAngle2)
+                table.putNumber("Average TurningAngle:", FinalturningAngle)
             elif haveAngle:
-                table.putNumber("TurningAngle", turningAngle)
-            elif haveAngle2:
-                table.putNumber("TurningAngle", turningAngle2)
+                table.putNumber("TurningAngle Camera 1:" + turningAngle)
+                table.putNumber("TurningAngle Camera 2:" + turningAngle2)
+
+            elif haveAngle2:        
+                table.putNumber("TurningAngle Camera 1:" + turningAngle)
+                table.putNumber("TurningAngle Camera 2:" + turningAngle2)
 
             frame_count += 1
 
