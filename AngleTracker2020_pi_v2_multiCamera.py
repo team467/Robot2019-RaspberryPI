@@ -117,6 +117,7 @@ def extra_processing(pipeline3, frame):
                 haveDistance = True
             """
 
+            # A distance filter
             # if (distanceFromTarget <= 350) and (distanceFromTarget >= 100):
             #         cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             #         cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
