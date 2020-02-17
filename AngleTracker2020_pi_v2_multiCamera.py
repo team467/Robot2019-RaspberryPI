@@ -1,4 +1,6 @@
 # This version of AngleTracker2020 is supposed to be used on the raspberry pi
+# This is probably the final version we will use
+# It is able to support both cameras
 
 import cv2
 from networktables import NetworkTables
