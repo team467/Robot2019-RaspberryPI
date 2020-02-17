@@ -196,9 +196,9 @@ def main():
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             pipeline3.process(frame)
-            pipeline3.process(frame2)
-
             haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
+
+            pipeline3.process(frame2)
             haveAngle2, haveDistance2, turningAngle2, distanceFromTarget2 = extra_processing(pipeline3, frame2)
 
             # put values to network tables
