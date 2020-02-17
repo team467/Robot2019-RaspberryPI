@@ -51,6 +51,7 @@ def extra_processing(pipeline3, frame):
 
         # only draw bounding box and do calculations if ratio of w to h of box is between 2.0 and 2.5 inclusive
         bounding_rect_aspect_ratio = w/h
+        # If perfect, the bounding box ratio is around 2.31
         if bounding_rect_aspect_ratio >= 1.7 and bounding_rect_aspect_ratio < 2.6:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
