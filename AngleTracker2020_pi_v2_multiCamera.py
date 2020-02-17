@@ -81,8 +81,6 @@ def extra_processing(pipeline3, frame):
             # calculate distance of camera from target in inches
             distanceFromTarget = 20170/h
 
-            haveDistance = True
-
             # convert distance from target from inches to ft and inches
             feet = distanceFromTarget/12
             inches = distanceFromTarget%12
@@ -103,10 +101,12 @@ def extra_processing(pipeline3, frame):
             # The miscellaneous boxes are usually are pretty off, and the driver should line us up pretty well
             if (angleDeg > 30 or angleDeg < -30):
               haveAngle = False
+              haveDistance = False
               print("the angle is greater than 30 degrees")
             
             else:
                 haveAngle = True
+                haveDistance = True
 
             # if (distanceFromTarget <= 350) and (distanceFromTarget >= 100):
             #         cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
