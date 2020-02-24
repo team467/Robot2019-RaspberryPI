@@ -6,6 +6,7 @@ import cv2
 from networktables import NetworkTables
 import threading
 from reduced_pipeline_hsl_rgb_convex_hull import RetroReflectiveTapeDetector
+# from reduced_pipeline_hsl_rgb_convex_hull_test import RetroReflectiveTapeDetector
 from math import *
 import sys
 from numpy import *
@@ -54,10 +55,10 @@ def extra_processing(pipeline3, frame):
         # only draw bounding box and do calculations if ratio of w to h of box is between 2.0 and 2.5 inclusive
         bounding_rect_aspect_ratio = w/h
         # If perfect, the bounding box ratio is around 2.31
-        if bounding_rect_aspect_ratio >= 1.7 and bounding_rect_aspect_ratio < 2.6:
+        if bounding_rect_aspect_ratio >= 2.15 and bounding_rect_aspect_ratio < 2.4:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
-            # cv2.imshow("frame", frame)
+            cv2.imshow("frame", frame)
 
             # print("height: {}, width: {}".format(h, w))
 
@@ -160,25 +161,25 @@ def main():
     distanceFromTarget2 = 0
     turningAngle2 = 0
 
-    cond = threading.Condition()
-    notified = [False]
+    # cond = threading.Condition()
+    # notified = [False]
 
-    def connectionListener(connected, info):
-        with cond:
-            notified[0] = True
-            cond.notify()
+    # def connectionListener(connected, info):
+    #     with cond:
+    #         notified[0] = True
+    #         cond.notify()
 
 
-    # Initializing and connecting to network tables
-    NetworkTables.initialize(server='10.4.67.2')
-    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+    # # Initializing and connecting to network tables
+    # NetworkTables.initialize(server='10.4.67.2')
+    # NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 
-    # wait till network tables are found
-    with cond:
-        if not notified[0]:
-            cond.wait()
+    # # wait till network tables are found
+    # with cond:
+    #     if not notified[0]:
+    #         cond.wait()
 
-    table = NetworkTables.getTable('vision')
+    # table = NetworkTables.getTable('vision')
    
     pipeline3 = RetroReflectiveTapeDetector()
 
@@ -255,43 +256,43 @@ def main():
 
             # put values to network tables
             
-            # Camera 1
-            table.putBoolean("haveAngle", haveAngle)
-            table.putBoolean("haveDistance", haveDistance)
+            # # Camera 1
+            # table.putBoolean("haveAngle", haveAngle)
+            # table.putBoolean("haveDistance", haveDistance)
             
-            # Camera 2
-            table.putBoolean("haveAngle2", haveAngle2)
-            table.putBoolean("haveDistance2", haveDistance2)
+            # # Camera 2
+            # table.putBoolean("haveAngle2", haveAngle2)
+            # table.putBoolean("haveDistance2", haveDistance2)
 
             print("haveDistance: {}, haveAngle: {}".format(haveDistance, haveAngle))
             print("haveDistance2: {}, haveAngle2: {}".format(haveDistance2, haveAngle2))
 
             if haveDistance and haveDistance2:
                 finalDistanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
-                table.putNumber("DistanceFromTarget", finalDistanceFromTarget)
-                # print("DistanceFromTarget: {}".format(finalDistanceFromTarget))
+                # table.putNumber("DistanceFromTarget", finalDistanceFromTarget)
+                print("DistanceFromTarget: {}".format(finalDistanceFromTarget))
             elif haveDistance:
-                table.putNumber("DistanceFromTarget", distanceFromTarget)
-                # print("DistanceFromTarget: {}".format(distanceFromTarget))
+                # table.putNumber("DistanceFromTarget", distanceFromTarget)
+                print("DistanceFromTarget: {}".format(distanceFromTarget))
             elif haveDistance2:
-                table.putNumber("DistanceFromTarget", distanceFromTarget2)
-                # print("DistanceFromTarget: {}".format(distanceFromTarget2))
+                # table.putNumber("DistanceFromTarget", distanceFromTarget2)
+                print("DistanceFromTarget: {}".format(distanceFromTarget2))
 
             if haveAngle and haveAngle2:
                 finalTurningAngle = (turningAngle + turningAngle2)/2
-                table.putNumber("Average TurningAngle:", finalTurningAngle)
-                # print("TurningAngle: {}".format(finalTurningAngle))
+                # table.putNumber("Average TurningAngle:", finalTurningAngle)
+                print("TurningAngle: {}".format(finalTurningAngle))
             elif haveAngle:
-                table.putNumber("TurningAngle", turningAngle)
-                # print("TurningAngle: {}".format(turningAngle))
+                # table.putNumber("TurningAngle", turningAngle)
+                print("TurningAngle: {}".format(turningAngle))
             elif haveAngle2:   
-                table.putNumber("TurningAngle", turningAngle2)
-                # print("TurningAngle: {}".format(turningAngle2))
+                # table.putNumber("TurningAngle", turningAngle2)
+                print("TurningAngle: {}".format(turningAngle2))
 
-            # if have_frame:
-            #     cv2.imwrite("/home/pi/Vision2020/frames/frame1.jpg", frame)
-            # if have_frame2:
-            #     cv2.imwrite("/home/pi/Vision2020/frames/frame2.jpg", frame2)
+            if have_frame:
+                cv2.imwrite("/home/pi/Vision2020/frames/frame1.jpg", frame)
+            if have_frame2:
+                cv2.imwrite("/home/pi/Vision2020/frames/frame2.jpg", frame2)
 
             frame_count += 1
 
