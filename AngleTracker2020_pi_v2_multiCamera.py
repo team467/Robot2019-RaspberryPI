@@ -6,12 +6,11 @@ import cv2
 from networktables import NetworkTables
 import threading
 from reduced_pipeline_hsl_rgb_convex_hull import RetroReflectiveTapeDetector
-# from reduced_pipeline_hsl_rgb_convex_hull_test import RetroReflectiveTapeDetector
 from math import *
 import sys
 from numpy import *
 
-def extra_processing(pipeline3, frame):
+def extra_processing(capNum, pipeline3, frame):
     """
     Performs extra processing on the pipeline's outputs and publishes data to NetworkTables.
     :param pipeline: the pipeline that just processed an image
@@ -36,6 +35,7 @@ def extra_processing(pipeline3, frame):
     haveDistance = False
     angleDeg = 0
     distanceFromTarget = 0
+    horizontalDistance = 0
  
     # Find the bounding boxes of the contours to get x, y, width, and height and calculate distance and angle
     for contour in pipeline3.filter_contours_output:
@@ -55,10 +55,10 @@ def extra_processing(pipeline3, frame):
         # only draw bounding box and do calculations if ratio of w to h of box is between 2.0 and 2.5 inclusive
         bounding_rect_aspect_ratio = w/h
         # If perfect, the bounding box ratio is around 2.31
-        if bounding_rect_aspect_ratio >= 2.15 and bounding_rect_aspect_ratio < 2.4:
+        if bounding_rect_aspect_ratio >= 1.7 and bounding_rect_aspect_ratio < 3.35:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
             cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
-            cv2.imshow("frame", frame)
+            # cv2.imshow("frame", frame)
 
             # print("height: {}, width: {}".format(h, w))
 
@@ -82,13 +82,16 @@ def extra_processing(pipeline3, frame):
                 distanceFromCenterFrameInches = (frameCenterX - boundingCenterX) * (39.25/w)
 
             # calculate distance of camera from target in inches
-            distanceFromTarget = 20170/h
+            if capNum == 1:
+                distanceFromTarget = 20170/h
+            if capNum == 2:
+                distanceFromTarget = 16000/h
 
             # convert distance from target from inches to ft and inches
             feet = distanceFromTarget/12
             inches = distanceFromTarget%12
 
-            haveDistance = True
+            # haveDistance = True
 
             # finding turning angle in radians
             angleRad = atan(distanceFromCenterFrameInches/distanceFromTarget)
@@ -100,7 +103,7 @@ def extra_processing(pipeline3, frame):
                 angleDeg = degrees(angleRad)*(-1) # if center of bounding box is to the left of the center of the frame, positive angle
             
 
-            haveAngle = True
+            # haveAngle = True
 
             """
             This is used to try and remove bounding boxes that aren't correct
@@ -119,17 +122,18 @@ def extra_processing(pipeline3, frame):
             """
 
             # A distance filter
-            # if (distanceFromTarget <= 350) and (distanceFromTarget >= 100):
-            #         cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
-            #         cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
-            #         cv2.imshow("frame", frame)
+            if (distanceFromTarget <= 480) and (distanceFromTarget >= 100) and (y >= 5) and ((y+h) <= 715):
+                    cv2.rectangle(frame, (x,y), (x+w,y+h), (255, 0, 0), 2)
+                    cv2.line(frame, (x,y), (x,y), (0,255,0), 10)
+                    # cv2.imshow("frame", frame)
 
-            #         print("height: {}, width: {}".format(h, w))
-            #         haveDistance = True
-            #         haveAngle = True
-            # else:
-            #     haveDistance = False
-            #     haveAngle = False
+                    # print("height: {}, width: {}, x: {}, y: {}".format(h, w, x, y,))
+                    haveDistance = True
+                    haveAngle = True
+                    break
+            else:
+                haveDistance = False
+                haveAngle = False
 
             
             # print("height: {}, width: {}, area: {}, distance: {}, x: {}, y: {}, angle: {}".format(h, w, (h*w), distanceFromTarget, x, y, angleDeg))
@@ -155,31 +159,32 @@ def main():
     haveDistance = False
     distanceFromTarget = 0
     turningAngle = 0
+    horizontalDistance = 0
 
     haveAngle2 = False
     haveDistance2 = False
     distanceFromTarget2 = 0
     turningAngle2 = 0
 
-    # cond = threading.Condition()
-    # notified = [False]
-
-    # def connectionListener(connected, info):
-    #     with cond:
-    #         notified[0] = True
-    #         cond.notify()
-
-
-    # # Initializing and connecting to network tables
-    # NetworkTables.initialize(server='10.4.67.2')
-    # NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
-
-    # # wait till network tables are found
-    # with cond:
-    #     if not notified[0]:
-    #         cond.wait()
-
-    # table = NetworkTables.getTable('vision')
+    cond = threading.Condition()
+    notified = [False]
+    
+    def connectionListener(connected, info):
+        with cond:
+            notified[0] = True
+            cond.notify()
+    
+    
+    # Initializing and connecting to network tables
+    NetworkTables.initialize(server='10.4.67.2')
+    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+    
+    # wait till network tables are found
+    with cond:
+        if not notified[0]:
+            cond.wait()
+    
+    table = NetworkTables.getTable('vision')
    
     pipeline3 = RetroReflectiveTapeDetector()
 
@@ -191,18 +196,18 @@ def main():
     # Two cameras
     while (cap == None) and (cap2 == None):
         try:
-            print("cap")
+            # print("cap")
             cap = cv2.VideoCapture(0)
         except:
             cap = None
-            print("trying")
+            # print("trying")
 
         try:
-            print("cap2")
+            # print("cap2")
             cap2 = cv2.VideoCapture(2)
         except:
             cap2 = None
-            print("trying2")
+            # print("trying2")
 
         try:
             if cap.isOpened() == False:
@@ -217,14 +222,14 @@ def main():
         
         
 
-        print(cap == None)
-        print(cap2 == None)
-        print(cap)
-        print(cap2)
-        print((cap == None) and (cap2 == None))
+        # print(cap == None)
+        # print(cap2 == None)
+        # print(cap)
+        # print(cap2)
+        # print((cap == None) and (cap2 == None))
 
 
-    print("found a camera")
+    # print("found a camera")
     # set resolution of video feed to 1280x720
     if cap != None:
         change_res(cap, 1280, 720)
@@ -238,61 +243,64 @@ def main():
         try:
             have_frame, frame = cap.read()
         except BaseException:
-            print("no have_frame")
+            # print("no have_frame")
+            pass
         try:
             have_frame2, frame2 = cap2.read()
         except BaseException:
-            print("no have_frame2")
-        # have_frame3, frame3, cap3.read()
+            # print("no have_frame2")
+            pass
+        #have_frame3, frame3, cap3.read()
         if (have_frame or have_frame2):
 
             # process returned frame from video feed and return angle, distance, if angle is found, if distance is found
             if have_frame:
                 pipeline3.process(frame)
-                haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(pipeline3, frame)
+                haveAngle, haveDistance, turningAngle, distanceFromTarget = extra_processing(1, pipeline3, frame)
             if have_frame2:
                 pipeline3.process(frame2)
-                haveAngle2, haveDistance2, turningAngle2, distanceFromTarget2 = extra_processing(pipeline3, frame2)
+                haveAngle2, haveDistance2, turningAngle2, distanceFromTarget2 = extra_processing(2, pipeline3, frame2)
 
             # put values to network tables
             
-            # # Camera 1
-            # table.putBoolean("haveAngle", haveAngle)
-            # table.putBoolean("haveDistance", haveDistance)
+            # Camera 1
+            table.putBoolean("haveAngle", haveAngle)
+            table.putBoolean("haveDistance", haveDistance)
             
-            # # Camera 2
-            # table.putBoolean("haveAngle2", haveAngle2)
-            # table.putBoolean("haveDistance2", haveDistance2)
+            # Camera 2
+            table.putBoolean("haveAngle2", haveAngle2)
+            table.putBoolean("haveDistance2", haveDistance2)
 
-            print("haveDistance: {}, haveAngle: {}".format(haveDistance, haveAngle))
-            print("haveDistance2: {}, haveAngle2: {}".format(haveDistance2, haveAngle2))
+            # print("haveDistance: {}, haveAngle: {}".format(haveDistance, haveAngle))
+            # print("haveDistance2: {}, haveAngle2: {}".format(haveDistance2, haveAngle2))
+            # print("distanceFromTarget: {}, distanceFromTarget2: {}".format(distanceFromTarget, distanceFromTarget2))
 
             if haveDistance and haveDistance2:
                 finalDistanceFromTarget = (distanceFromTarget + distanceFromTarget2)/2
-                # table.putNumber("DistanceFromTarget", finalDistanceFromTarget)
-                print("DistanceFromTarget: {}".format(finalDistanceFromTarget))
+                table.putNumber("DistanceFromTarget", finalDistanceFromTarget)
+                # print("DistanceFromTarget: {}".format(finalDistanceFromTarget))
             elif haveDistance:
-                # table.putNumber("DistanceFromTarget", distanceFromTarget)
-                print("DistanceFromTarget: {}".format(distanceFromTarget))
+                table.putNumber("DistanceFromTarget", distanceFromTarget)
+                # print("DistanceFromTarget: {}, HorizontalDistance: {}".format(distanceFromTarget, horizontalDistance))
             elif haveDistance2:
-                # table.putNumber("DistanceFromTarget", distanceFromTarget2)
-                print("DistanceFromTarget: {}".format(distanceFromTarget2))
+                table.putNumber("DistanceFromTarget", distanceFromTarget2)
+                # print("DistanceFromTarget: {}".format(distanceFromTarget2))
 
             if haveAngle and haveAngle2:
                 finalTurningAngle = (turningAngle + turningAngle2)/2
-                # table.putNumber("Average TurningAngle:", finalTurningAngle)
-                print("TurningAngle: {}".format(finalTurningAngle))
+                table.putNumber("Average TurningAngle:", finalTurningAngle)
+                # print("TurningAngle: {}".format(finalTurningAngle))
             elif haveAngle:
-                # table.putNumber("TurningAngle", turningAngle)
-                print("TurningAngle: {}".format(turningAngle))
+                table.putNumber("TurningAngle", turningAngle)
+                # print("TurningAngle: {}".format(turningAngle))
             elif haveAngle2:   
-                # table.putNumber("TurningAngle", turningAngle2)
-                print("TurningAngle: {}".format(turningAngle2))
+                table.putNumber("TurningAngle", turningAngle2)
+                # print("TurningAngle: {}".format(turningAngle2))
 
-            if have_frame:
-                cv2.imwrite("/home/pi/Vision2020/frames/frame1.jpg", frame)
-            if have_frame2:
-                cv2.imwrite("/home/pi/Vision2020/frames/frame2.jpg", frame2)
+            # if have_frame:
+            #     cv2.imwrite("/home/pi/Vision2020/frames/frame1.jpg", frame)
+            # if have_frame2:
+            #     cv2.imwrite("/home/pi/Vision2020/frames/frame2.jpg", frame2)
 
             frame_count += 1
 
