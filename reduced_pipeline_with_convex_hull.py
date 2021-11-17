@@ -1,3 +1,4 @@
+# This is the official file used for the GRIP values.
 import cv2
 import numpy
 import math

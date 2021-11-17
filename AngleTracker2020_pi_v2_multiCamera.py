@@ -1,4 +1,5 @@
-# This version of AngleTracker2020 is supposed to be used on the raspberry pi
+# This version of AngleTracker2020 is used on the raspberry pi.
+# This is the pythin file we used to find the position.
 # This is probably the final version we will use
 # It is able to support both cameras
 
