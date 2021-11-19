@@ -1,4 +1,6 @@
 # This is the official file used for the GRIP values.
+# This is the final file used.
+
 import cv2
 import numpy
 import math
